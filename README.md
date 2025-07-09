@@ -20,7 +20,7 @@ properties.
 
 2 - Formal Power Series using classical axioms. These are defined as the
 inverse limit of the truncated power series allowing to transfer easily result
-between the two setting.
+between the two settings.
 
 The main results are
 - formula for the multiplicative inverse of a series both in a commutative and
@@ -32,14 +32,14 @@ The main results are
 - Lagrange inversion formulas (Lagrange-Bürmann theorem);
 - exponential and logarithm series.
 
-All those results are proved both for truncated and non-trucated series.
+All those results are proved both for truncated and non-truncated series.
 
 
 ## Application to combinatorics
 
 To test the framework I provide 6 proofs of the formula for Catalan
 numbers. I'm using the following 3 different strategies together with
-truncated and non-trucated series:
+truncated and non-truncated series:
 
 1 - prove the algebraic equation `F = 1 + X F^2` and extract the
 coefficients using square root and Newton's formula;
@@ -52,7 +52,7 @@ using Lagrange inversion formula;
  `(n+2) C(n+1) = (4n + 2) C(n)` and solve it.
 
 
-All these files are still largely experimental
+All these files are still largely experimental.
 
 To compile it I'm using the following opam packages:
 ```
