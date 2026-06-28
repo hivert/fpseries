@@ -24,7 +24,7 @@ order canonical structures.
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot.
 From mathcomp Require Import order ssralg.
 
 
@@ -81,10 +81,10 @@ Fact addbarA : associative addbar.
 Proof. by case=> [m|] [n|] [p|] //=; rewrite addnA. Qed.
 HB.instance Definition _ :=
   GRing.isNmodule.Build natbar addbarA addbarC add0bar.
-Fact Nat_semi_additive : semi_additive Nat.
+Fact Nat_is_nmod_morphism : nmod_morphism Nat.
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build _ _ Nat Nat_semi_additive.
+  GRing.isNmodMorphism.Build _ _ Nat Nat_is_nmod_morphism.
 
 Lemma addbar_eq0 u v : (u + v == Nat 0)%R = (u == Nat 0) && (v == Nat 0).
 Proof.

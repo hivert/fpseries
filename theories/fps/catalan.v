@@ -55,10 +55,10 @@ Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
 
 Import GRing.Theory.
 
-Local Definition char_rat := Num.Theory.char_num rat.
-Local Definition nat_unit := nat_unit_field char_rat.
-Local Definition fact_unit := fact_unit char_rat.
-Hint Resolve char_rat nat_unit : core.
+Local Definition pchar_rat := Num.Theory.pchar_num rat.
+Local Definition nat_unit := nat_unit_field pchar_rat.
+Local Definition fact_unit := fact_unit pchar_rat.
+Hint Resolve pchar_rat nat_unit : core.
 
 Section GenSeries.
 
@@ -106,12 +106,12 @@ have: (2%:R *: \X * FC n - 1) ^+ 2 = 1 - 4%:R *: \X.
   rewrite -{1}(mulr1 (4%:R * _)) -[X in _ + X + _]mulrA -mulrDr.
   rewrite -FC_algebraic_eq.
   by rewrite -[_ *+ 2]mulr_natl !mulrA -natrM subrr.
-move/(sqrtE char_rat) => /(_ co1) [HeqP | HeqN].
+move/(sqrtE pchar_rat) => /(_ co1) [HeqP | HeqN].
   exfalso; move: HeqP => /(congr1 (fun x : {tfps _ _ } => x`_0)).
   rewrite mulr_nat coefB -mulrA mulrC -mulrA coef_tfpsXM coef1 /=.
   rewrite (eqP (coeft0_eq1_expr _ _)) => /eqP.
   rewrite -subr_eq0 add0r -oppr_eq0 opprD opprK -mulr2n => /eqP Habs.
-  by have:= char_rat 2; rewrite !inE Habs /= eq_refl.
+  by have:= pchar_rat 2; rewrite !inE Habs /= eq_refl.
 have neq20 : 2%:R != 0 :> rat by rewrite Num.Theory.pnatr_eq0.
 apply (scalerI neq20); rewrite scalerA divff // scale1r -HeqN.
 by rewrite addrC subrK scalerAl.
@@ -144,7 +144,7 @@ congr (_ * _); rewrite {F} mulrC invfM // !mulrA; congr (_ * _).
 rewrite mul2n -{2}[i.*2.+1]addn1 [X in X / _]mulrC -mulrA; congr (_ * _).
 rewrite -[i.*2.+2]addn1 addSnnS -mul2n -[X in (_ + X)%N]muln1.
 rewrite -mulnDr addn1 natrM mulfK //.
-by have /charf0P -> := char_rat.
+by have /pcharf0P -> := pchar_rat.
 Qed.
 
 Theorem Cat_rat i : (C i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
@@ -256,12 +256,11 @@ have -> : tmulX F^`() = (F - 1)/(1 - \X *+ 2 * F).
   rewrite derivD_tfps deriv_tfps1 add0r.
   rewrite derivM_tfps /= deriv_tfpsX mul1r derivX_tfps /= expr1.
   rewrite raddfD /= -trXnt_tmulX // (tmulXE (F ^+ 2)).
-  rewrite trXntM // trXnt_trXnt // trXnt_id trXnt_tfpsX.
-  rewrite FalgN [X in _ + tmulX X]mulrC -tmulXM.
-  rewrite raddfMn /= [X in (tmulX X) *+ 2]mulrC -tmulXM.
-  rewrite -(subr_eq _ _ (_ _ * \X)).
-  rewrite -mulrnAr -mulrA -{1}(mulr1 (tmulX _)) -mulrBr.
-  by rewrite [_ * \X]mulrC mulrnAl mulrnAr.
+  rewrite trXntM // trXnt_trXnt // trXnt_id  [trXnt n.+1 _]trXnt_tfpsX.
+  rewrite {}FalgN -subr_eq => /eqP <-; apply/eqP.
+  rewrite [in RHS]mulrnAr -mulrnAl mulrA [_ * F^`()%tfps]mulrC.
+  rewrite -[_ \X *+ 2]raddfMn -trXntM //= -[in RHS]tmulXM.
+  by rewrite -{2}(mulr1 (tmulX _)) -mulrBr.
 rewrite mulrA -[X in X + _](mulrK X2Fu) -mulrDl -[RHS]divr1.
 apply/eqP; rewrite eq_divr ?unitr1 // mulr1 mul1r.
 rewrite -mulrA [F * _]mulrC [(1 - _ * F) * F]mulrBl -mulrA -expr2.

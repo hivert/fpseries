@@ -55,10 +55,10 @@ Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
 
 Import GRing.Theory.
 
-Local Definition char_rat := Num.Theory.char_num rat.
-Local Definition nat_unit := tfps.TFPSField.nat_unit_field char_rat.
-Local Definition fact_unit := tfps.TFPSField.fact_unit char_rat.
-Hint Resolve char_rat nat_unit : core.
+Local Definition pchar_rat := Num.Theory.pchar_num rat.
+Local Definition nat_unit := tfps.TFPSField.nat_unit_field pchar_rat.
+Local Definition fact_unit := tfps.TFPSField.fact_unit pchar_rat.
+Hint Resolve pchar_rat nat_unit : core.
 
 Section GenSeries.
 
@@ -108,7 +108,7 @@ move/(sqrtE nat_unit) => /(_ co1) [HeqP | HeqN].
   rewrite mulr_nat coefsB -mulrA mulrC -mulrA coef_fpsXM coefs1 /=.
   rewrite (eqP (coefs0_eq1_expr _ _)) => /eqP.
   rewrite -subr_eq0 add0r -oppr_eq0 opprD opprK -mulr2n => /eqP Habs.
-  by have:= char_rat 2; rewrite !inE Habs /= eq_refl.
+  by have:= pchar_rat 2; rewrite !inE Habs /= eq_refl.
 have neq20 : 2%:R != 0 :> rat by rewrite Num.Theory.pnatr_eq0.
 apply (scalerI neq20); rewrite scalerA divff // scale1r -HeqN.
 by rewrite addrC subrK scalerAl.
@@ -140,7 +140,7 @@ congr (_ * _); rewrite {F} mulrC invfM // !mulrA; congr (_ * _).
 rewrite mul2n -{2}[i.*2.+1]addn1 [X in X / _]mulrC -mulrA; congr (_ * _).
 rewrite -[i.*2.+2]addn1 addSnnS -mul2n -[X in (_ + X)%N]muln1.
 rewrite -mulnDr addn1 natrM mulfK //.
-by have /charf0P -> := char_rat.
+by have /pcharf0P -> := pchar_rat.
 Qed.
 
 Theorem Cat_rat i : (C i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.

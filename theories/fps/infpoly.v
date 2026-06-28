@@ -13,7 +13,7 @@
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import all_boot ssralg.
 From mathcomp Require Import freeg mpoly.
 From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import order.
@@ -33,7 +33,7 @@ Import GRing.Theory.
 
 Section CNVars.
 
-Variable R : comRingType.
+Variable R : comNzRingType.
 
 Section Defs.
 
@@ -49,15 +49,17 @@ Definition cnvar_tuple : m.-tuple {mpoly R[n]} :=
   Tuple (cnvar_tupleP [tuple 'X_i | i < n] 0).
 Definition cnvar p := p \mPo cnvar_tuple.
 
-Fact cnvar_is_additive : additive cnvar.
+Fact cnvar_is_zmod_morphism : zmod_morphism cnvar.
 Proof. exact: rmorphB. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {mpoly R[m]} {mpoly R[n]} _ cnvar_is_additive.
+  GRing.isZmodMorphism.Build
+    {mpoly R[m]} {mpoly R[n]} _ cnvar_is_zmod_morphism.
 
-Fact cnvar_is_multplicative : multiplicative cnvar.
-Proof.  split; [exact: rmorphM | exact: rmorph1]. Qed.
+Fact cnvar_is_monoid_morphism : monoid_morphism cnvar.
+Proof.  split; [exact: rmorph1 | exact: rmorphM]. Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {mpoly R[m]} {mpoly R[n]} _ cnvar_is_multplicative.
+  GRing.isMonoidMorphism.Build
+    {mpoly R[m]} {mpoly R[n]} _ cnvar_is_monoid_morphism.
 
 Fact cnvar_is_linear : linear cnvar.
 Proof. exact: linearP. Qed.
@@ -106,16 +108,17 @@ Definition infpoly_sys :=
 
 Variables (m n : nat) (le_m_n : (m <= n)%O).
 
-Fact cnvarbond_is_additive : additive (cnvarbond le_m_n).
+Fact cnvarbond_is_zmod_morphism : zmod_morphism (cnvarbond le_m_n).
 Proof. exact: rmorphB. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {mpoly R[m]} {mpoly R[n]} _ cnvarbond_is_additive.
+  GRing.isZmodMorphism.Build
+    {mpoly R[m]} {mpoly R[n]} _ cnvarbond_is_zmod_morphism.
 
-Fact cnvarbond_is_multplicative : multiplicative (cnvarbond le_m_n).
-Proof.  split; [exact: rmorphM | exact: rmorph1]. Qed.
+Fact cnvarbond_is_monoid_morphism : monoid_morphism (cnvarbond le_m_n).
+Proof.  split; [exact: rmorph1 | exact: rmorphM]. Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build
-    {mpoly R[m]} {mpoly R[n]} _ cnvarbond_is_multplicative.
+  GRing.isMonoidMorphism.Build
+    {mpoly R[m]} {mpoly R[n]} _ cnvarbond_is_monoid_morphism.
 
 Fact cnvarbond_is_linear : linear (cnvarbond le_m_n).
 Proof. exact: linearP. Qed.
@@ -132,7 +135,7 @@ End CNVars.
 
 Section Tests.
 
-Variable R : comRingType.
+Variable R : comNzRingType.
 
 (*
 Check {dirlim infpoly_sys R} : algType R.

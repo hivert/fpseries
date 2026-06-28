@@ -21,7 +21,7 @@
 \(x, y\in S\) there is a \(z\in S\) such that \(x\leq z\) and \(y\leq z\).
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import all_boot.
 From mathcomp Require Import order.
 
 Require Import natbar.
@@ -79,7 +79,7 @@ Canonical natdvd_dirType := DirType natdvd (@lattice_dirMixin _ _).
 *)
 
 
-(* Commented out since nee classical_sets and not needed anyway
+(* Commented out since need classical_sets and not needed anyway
 
 From mathcomp Require Import boolp classical_sets.
 Section UpSets.

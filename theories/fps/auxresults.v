@@ -84,7 +84,7 @@ Section MoreCoef.
 
 Open Scope ring_scope.
 
-Lemma coefMD_wid (R : ringType) (p q : {poly R}) (m n i : nat) :
+Lemma coefMD_wid (R : nzSemiRingType) (p q : {poly R}) (m n i : nat) :
   i < m -> i < n ->
   (p * q)`_i = \sum_(j1 < m) \sum_(j2 < n | (j1 + j2)%N == i) p`_j1 * q`_j2.
 Proof.
@@ -100,7 +100,7 @@ apply/eqP; rewrite xpair_eqE -!val_eqE /= ?val_insubd i_def !ltnS.
 by rewrite leq_addr eqxx /= subSS addKn.
 Qed.
 
-Lemma coefMD (R : ringType) (p q : {poly R}) (i : nat) :
+Lemma coefMD (R : nzSemiRingType) (p q : {poly R}) (i : nat) :
  (p * q)`_i = \sum_(j1 < size p)
               \sum_(j2 < size q | (j1 + j2)%N == i) p`_j1 * q`_j2.
 Proof.
@@ -182,7 +182,7 @@ End MoreFieldTheory.
 
 Local Notation "p ^ f" := (map_poly f p).
 
-Lemma map_poly_injective (R S : ringType) (f : {rmorphism R -> S}) :
+Lemma map_poly_injective (R S : nzSemiRingType) (f : {rmorphism R -> S}) :
   injective f -> injective (map_poly f).
 Proof.
 move=> finj p q /polyP eq_pq; apply/polyP=> i; have := eq_pq i.
@@ -191,7 +191,7 @@ Qed.
 
 Section AuxiliaryResults.
 
-Variable (R : ringType).
+Variable (R : nzSemiRingType).
 Implicit Types (p : {poly R}).
 
 Lemma map_poly_mul (c : R) p : p ^ ( *%R c) = c *: p.
