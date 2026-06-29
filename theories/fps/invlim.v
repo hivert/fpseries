@@ -15,7 +15,93 @@
 (******************************************************************************)
 (** * Inverse Limits
 
-- {invlim Sys} == a default implementation of the inverse limits of [Sys]
+In the following we use the following notation:
+
+-   I : dirType d == a directed type
+- Obj : I -> Type == a map associating to each i of type I an object of
+                       some category
+-   bonding le_ij == a morphism Obj j -> Obj i where (le_ij : i <= j)
+
+We define the following notion and notations:
+
+is_invsys bonding == a type for proofs that the bonding morphisms define
+                     a proper inverse system.
+   isthread Sys T == T is a thread that is a map associating to any i in I
+                     any element of Obj i such that the bonding morphisms
+                     map the T i to each other
+      cone Sys CC == C : forall i, T -> Obj i is a cone from T for the
+                     system Sys
+
+       'pi[ilT]_i == the morphim from ilt -> Obj i where ilT is an
+                     inverse limit
+            'pi_i == idem inferring ilT from the context
+      'ind[dlT] C == the morphism T -> ilT induced by the universal
+                     property where C : cone Sys C is a cone from T
+           'ind C == idem where ilT is inferred from the context
+
+     {invlim Sys} == a default implementation of the inverse limits of [Sys]
+
+         valuat x == for inverse limits on nat, the valuation of x, that is
+                     the minimum n in natbar such that 'pi_i x = 0 for all
+                     i < n. Then x = 0 is equivalent to valuat x = Inf.
+
+This file defines the following algebraic structures:
+
+         invLimType Sys == inverse limits of sets (Type)
+                           The HB class is called InvLim
+     nmodInvLimType Sys == inverse limits of N-modules
+                           The HB class is called NmoduleInvLim
+     zmodInvLimType Sys == inverse limits of Z-modules
+                           The HB class is called ZmoduleInvLim
+pzSemiRingInvLimType Sys == inverse limits of semi rings
+                           The HB class is called PzSemiRingInvLim
+nzSemiRingInvLimType Sys == inverse limits of non trivial semi rings
+                           The HB class is called NzSemiRingInvLim
+   pzRingInvLimType Sys == inverse limits of rings
+                           The HB class is called PzRingInvLim
+   nzRingInvLimType Sys == inverse limits of non trivial rings
+                           The HB class is called NzRingInvLim
+comPzSemiRingInvLimType Sys == inverse limits of commutative semi rings
+                           The HB class is called ComPzSemiRingInvLim
+comNzSemiRingInvLimType Sys == inverse limits of commutative, non trivial
+                           semi rings
+                           The HB class is called ComNzSemiRingInvLim
+comPzRingInvLimType Sys == inverse limits of commutative rings
+                           The HB class is called ComPzRingInvLim
+comNzRingInvLimType Sys == inverse limits of commutative, non trivial rings
+                           The HB class is called ComNzRingInvLim
+ unitRingInvLimType Sys == inverse limits of rings with computable units
+                           The HB class is called UnitRingInvLim
+comUnitRingInvLimType Sys == inverse limits of commutative rings with
+                           computable units
+                           The HB class is called ComUnitRingInvLim
+  idomainInvLimType Sys == inverse limits of integral, commutative ring
+                           The HB class is called IDomainInvLim
+    fieldInvLimType Sys == inverse limits of fields
+                           The HB class is called FieldInvLim
+ lSemiModInvLimType Sys == inverse limits of left semimodules. The base
+                           ring is inferred from the system Sys.
+                           The HB class is called LSemiModuleInvLim
+     lmodInvLimType Sys == inverse limits of left modules
+                           The HB class is called LmoduleInvLim
+ lSemiAlgInvLimType Sys == inverse limits of left semi-algebras
+                           The HB class is called LSemiAlgebraInvLim
+     lalgInvLimType Sys == inverse limits of left algebras
+                           The HB class is called LalgebraInvLim
+  semiAlgInvLimType Sys == inverse limits of semi-algebras
+                           The HB class is called SemiAlgebraInvLim
+      algInvLimType Sys == inverse limits of algebras
+                           The HB class is called AlgebraInvLim
+comSemiAlgInvLimType Sys == inverse limits of commutative semi-algebras
+                           The HB class is called ComSemiAlgebraInvLim
+   comAlgInvLimType Sys == inverse limits of commutative algebras
+                           The HB class is called ComAlgebraInvLim
+  unitAlgInvLimType Sys == inverse limits of algebras with computable units
+                           The HB class is called UnitAlgebraInvLim
+comUnitAlgInvLimType Sys == inverse limits of commutative algebras with
+                           computable units
+                           The HB class is called ComUnitAlgebraInvLim
+
 *******************************************************************************)
 From HB Require Import structures.
 From mathcomp Require Import all_boot ssralg.
@@ -60,12 +146,18 @@ Variables (disp : _) (I : porderType disp).
 (** For example : ringType / rmorphism.                                    *)
 Variable Obj : I -> Type.
 Variable bonding : (forall i j, i <= j -> Obj j -> Obj i).
-Record is_invsys : Type := IsInvSys {
-      invsys_inh : I;
+Record is_invsys : Prop := IsInvSys {
+      _ : I;
       invsys_id  : forall i (Hii : i <= i), (bonding Hii) =1 id;
       invsys_comp : forall i j k  (Hij : i <= j) (Hjk : j <= k),
           (bonding Hij) \o (bonding Hjk) =1 (bonding (le_trans Hij Hjk));
   }.
+
+Lemma invsys_inh : is_invsys -> I.
+Proof.
+move=> Sys; have ex : exists i : I, true by case: Sys.
+exact: (xchoose ex).
+Qed.
 
 (** Make sure the following definitions depend on the system and not only  *)
 (** on the morphisms. This is needed to triger the unification in the      *)
@@ -311,7 +403,7 @@ End NmodInvLimTheory.
 
 
 #[short(type="zmodInvLimType")]
-HB.structure Definition ZmodInvLim
+HB.structure Definition ZmoduleInvLim
     disp (I : porderType disp) (Obj : I -> nmodType)
     (bonding : forall i j, i <= j -> {additive Obj j -> Obj i})
     (Sys : is_invsys bonding)
@@ -319,37 +411,6 @@ HB.structure Definition ZmodInvLim
     ilT of NmodInvLim disp Sys ilT
     & GRing.Zmodule ilT
   }.
-
-(* This is inherited from NmodInvLim
-Section ZmodInvLimTheory.
-
-Variables (disp : _) (I : porderType disp).
-Variable Obj : I -> zmodType.
-Variable bonding : forall i j, i <= j -> {additive Obj j -> Obj i}.
-Variables (Sys : is_invsys bonding) (ilT : zmodInvLimType Sys).
-
-Implicit Type x y : ilT.
-
-Fact ilproj_is_zmod_morphism i : zmod_morphism ('pi[ilT]_i).
-Proof. exact: raddfB. Qed.
-#[export] HB.instance Definition _ i :=
-  GRing.isZmodMorphism.Build ilT (Obj i) _ (ilproj_is_zmod_morphism i).
-
-(** The universal induced map is a N-module morphism *)
-Section UniversalProperty.
-
-Variable (T : zmodType) (f : forall i, {additive T -> Obj i}).
-Hypothesis Hcone : cone Sys f.
-
-Fact ilind_is_zmod_morphism : zmod_morphism ('ind[ilT] Hcone).
-Proof. exact: raddfB. Qed.
-#[export] HB.instance Definition _ :=
-  GRing.isZmodMorphism.Build T ilT _ ilind_is_zmod_morphism.
-
-End UniversalProperty.
-
-End ZmodInvLimTheory.
-*)
 
 
 #[key="ilT"]
@@ -553,7 +614,7 @@ HB.structure Definition IDomainInvLim
 
 
 #[short(type="fieldInvLimType")]
-HB.structure Definition FieldRingInvLim
+HB.structure Definition FieldInvLim
     disp (I : porderType disp)
     (Obj : I -> fieldType)
     (bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i})
@@ -621,14 +682,14 @@ End LSemiModuleInvLimTheory.
 
 
 #[short(type="lmodInvLimType")]
-HB.structure Definition LmodInvLim
+HB.structure Definition LmoduleInvLim
     (R : pzRingType)
     disp (I : porderType disp)
     (Obj : I -> lmodType R)
     (bonding : forall i j, i <= j -> {linear Obj j -> Obj i})
     (Sys : is_invsys bonding)
   := {
-    ilT of ZmodInvLim _ Sys ilT
+    ilT of ZmoduleInvLim _ Sys ilT
     & isLSemiModuleInvLim R disp I Obj bonding Sys ilT
     & GRing.Lmodule R ilT
   }.
@@ -682,7 +743,7 @@ HB.structure Definition LalgebraInvLim
     (Sys : is_invsys bonding)
   := {
     ilT of PzRingInvLim disp Sys ilT
-    & LmodInvLim R Sys ilT
+    & LmoduleInvLim R Sys ilT
     & GRing.Lalgebra R ilT
   }.
 
@@ -691,7 +752,7 @@ HB.structure Definition LalgebraInvLim
 HB.structure Definition SemiAlgebraInvLim
     (R : pzSemiRingType)
     disp (I : porderType disp)
-    (Obj : I -> lSemiAlgType R)
+    (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   := {
@@ -704,7 +765,7 @@ HB.structure Definition SemiAlgebraInvLim
 HB.structure Definition AlgebraInvLim
     (R : pzRingType)
     disp (I : porderType disp)
-    (Obj : I -> lalgType R)
+    (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   := {
@@ -712,8 +773,57 @@ HB.structure Definition AlgebraInvLim
     & GRing.Algebra R ilT
   }.
 
-(* What about comAlgType, unitAlgType, comUnitAlgType... ??? *)
-(* Not needed unless particular theory need interface    ??? *)
+
+#[short(type="comSemiAlgInvLimType")]
+HB.structure Definition ComSemiAlgebraInvLim
+    (R : pzSemiRingType)
+    disp (I : porderType disp)
+    (Obj : I -> comSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
+    (Sys : is_invsys bonding)
+  := {
+    ilT of SemiAlgebraInvLim _ Sys ilT
+    & GRing.ComSemiAlgebra R ilT
+  }.
+
+
+#[short(type="comAlgInvLimType")]
+HB.structure Definition ComAlgebraInvLim
+    (R : pzRingType)
+    disp (I : porderType disp)
+    (Obj : I -> comAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
+    (Sys : is_invsys bonding)
+  := {
+    ilT of AlgebraInvLim _ Sys ilT
+    & GRing.ComAlgebra R ilT
+  }.
+
+
+#[short(type="unitAlgInvLimType")]
+HB.structure Definition UnitAlgebraInvLim
+    (R : unitRingType)
+    disp (I : porderType disp)
+    (Obj : I -> unitAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
+    (Sys : is_invsys bonding)
+  := {
+    ilT of AlgebraInvLim _ Sys ilT
+    & GRing.UnitAlgebra R ilT
+  }.
+
+
+#[short(type="comUnitAlgInvLimType")]
+HB.structure Definition ComUnitAlgebraInvLim
+    (R : comUnitRingType)
+    disp (I : porderType disp)
+    (Obj : I -> comUnitAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
+    (Sys : is_invsys bonding)
+  := {
+    ilT of AlgebraInvLim _ Sys ilT
+    & GRing.ComUnitAlgebra R ilT
+  }.
 
 
 (****************************************************************************)
@@ -1078,8 +1188,6 @@ HB.instance Definition _ :=
 Let check := ilT : comUnitRingInvLimType Sys.
 HB.end.
 
-(** ComUnitRingInvLim is just a join *)
-
 
 HB.factory Record InvLim_isIDomainInvLim
     disp (I : dirType disp)
@@ -1287,14 +1395,14 @@ HB.end.
 
 
 HB.factory Record InvLim_isSemiAlgebraInvLim
-    (R : pzRingType)
+    (R : pzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   ilT of InvLim _ Sys ilT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : pzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1435,6 +1543,7 @@ Variable Obj : I -> nmodType.
 Variable bonding : forall i j, i <= j -> {additive Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := InvLim_isNmodInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : nmodInvLimType Sys := {invlim Sys}.
 End Nmodule.
 
 Section Zmodule.
@@ -1442,6 +1551,7 @@ Variable Obj : I -> zmodType.
 Variable bonding : forall i j, i <= j -> {additive Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := InvLim_isZmodInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : zmodInvLimType Sys := {invlim Sys}.
 End Zmodule.
 
 Section PzSemiRing.
@@ -1450,6 +1560,7 @@ Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isPzSemiRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : pzSemiRingInvLimType Sys := {invlim Sys}.
 End PzSemiRing.
 
 Section NzSemiRing.
@@ -1458,6 +1569,7 @@ Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isNzSemiRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : nzSemiRingInvLimType Sys := {invlim Sys}.
 End NzSemiRing.
 
 Section PzRing.
@@ -1465,6 +1577,7 @@ Variable Obj : I -> pzRingType.
 Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := InvLim_isPzRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : pzRingInvLimType Sys := {invlim Sys}.
 End PzRing.
 
 Section NzRing.
@@ -1472,6 +1585,7 @@ Variable Obj : I -> nzRingType.
 Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := InvLim_isNzRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : nzRingInvLimType Sys := {invlim Sys}.
 End NzRing.
 
 Section ComPzSemiRing.
@@ -1480,6 +1594,7 @@ Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isComPzSemiRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : comPzSemiRingInvLimType Sys := {invlim Sys}.
 End ComPzSemiRing.
 
 Section ComNzSemiRing.
@@ -1512,6 +1627,7 @@ Variable bonding : forall i j, i <= j -> {rmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isUnitRingInvLim.Build _ _ _ _ Sys {invlim Sys}.
+Let check : unitRingInvLimType Sys := {invlim Sys}.
 End UnitRing.
 
 Section ComUnitRing.
@@ -1522,25 +1638,57 @@ HB.instance Definition _ := InvLim.on {invlim Sys}.
 Let test : comUnitRingInvLimType _ := {invlim Sys}.
 End ComUnitRing.
 
-Section Linear.
+Section LSemiModule.
+Variables (R : pzSemiRingType).
+Variable Obj : I -> lSemiModType R.
+Variable bonding : forall i j, i <= j -> {linear Obj j -> Obj i}.
+Variable Sys : is_invsys bonding.
+HB.instance Definition _ :=
+  InvLim_isLSemiModuleInvLim.Build R _ _ _ _ Sys {invlim Sys}.
+Let test : lSemiModInvLimType _ := {invlim Sys}.
+End LSemiModule.
+
+Section LModule.
 Variables (R : pzRingType).
 Variable Obj : I -> lmodType R.
 Variable bonding : forall i j, i <= j -> {linear Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isLmoduleInvLim.Build R _ _ _ _ Sys {invlim Sys}.
-End Linear.
+Let test : lmodInvLimType _ := {invlim Sys}.
+End LModule.
 
-Section Lalg.
+Section LSemiAlgebra.
+Variables (R : pzSemiRingType).
+Variable Obj : I -> lSemiAlgType R.
+Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
+Variable Sys : is_invsys bonding.
+HB.instance Definition _ :=
+  InvLim_isLSemiAlgebraInvLim.Build R _ _ _ _ Sys {invlim Sys}.
+Let test : lSemiAlgInvLimType _ := {invlim Sys}.
+End LSemiAlgebra.
+
+Section LAlgebra.
 Variables (R : pzRingType).
 Variable Obj : I -> lalgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isLalgebraInvLim.Build R _ _ _ _ Sys {invlim Sys}.
-End Lalg.
+Let test : lalgInvLimType _ := {invlim Sys}.
+End LAlgebra.
 
-Section Alg.
+Section SemiAlgebra.
+Variables (R : pzSemiRingType).
+Variable Obj : I -> semiAlgType R.
+Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
+Variable Sys : is_invsys bonding.
+HB.instance Definition _ :=
+  InvLim_isSemiAlgebraInvLim.Build R _ _ _ _ Sys {invlim Sys}.
+Let test : semiAlgInvLimType _ := {invlim Sys}.
+End SemiAlgebra.
+
+Section Algebra.
 Variables (R : pzRingType).
 Variable Obj : I -> algType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
@@ -1548,33 +1696,43 @@ Variable Sys : is_invsys bonding.
 HB.instance Definition _ :=
   InvLim_isAlgebraInvLim.Build R _ _ _ _ Sys {invlim Sys}.
 Let test : algInvLimType _ := {invlim Sys}.
-End Alg.
+End Algebra.
 
-Section UnitAlg.
-Variables (R : comPzRingType).
+Section ComSemiAlgebra.
+Variables (R : pzSemiRingType).
+Variable Obj : I -> comSemiAlgType R.
+Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
+Variable Sys : is_invsys bonding.
+HB.instance Definition _ := InvLim.on {invlim Sys}.
+Let test : comSemiAlgInvLimType _ := {invlim Sys}.
+End ComSemiAlgebra.
+
+Section ComAlgebra.
+Variables (R : pzRingType).
+Variable Obj : I -> comAlgType R.
+Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
+Variable Sys : is_invsys bonding.
+HB.instance Definition _ := InvLim.on {invlim Sys}.
+Let test : comAlgInvLimType _ := {invlim Sys}.
+End ComAlgebra.
+
+Section UnitAlgebra.
+Variables (R : unitRingType).
 Variable Obj : I -> unitAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := GRing.Algebra.on {invlim Sys}.
-End UnitAlg.
+Let test := {invlim Sys} : unitAlgType R.
+End UnitAlgebra.
 
-Section ComAlg.
-Variables (R : comPzRingType).
-Variable Obj : I -> comAlgType R.
-Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj j -> Obj i}.
-Variable Sys : is_invsys bonding.
-HB.instance Definition _ := GRing.Algebra.on {invlim Sys}.
-End ComAlg.
-
-(* Just a join 
-Section ComUnitAlg.
+Section ComUnitAlgebra.
 Variables (R : comUnitRingType).
-Variable Obj : I -> comAlgType R.
+Variable Obj : I -> comUnitAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
 HB.instance Definition _ := GRing.Algebra.on {invlim Sys}.
-End ComUnitAlg.
-*)
+Let test : comUnitAlgInvLimType Sys := {invlim Sys}.
+End ComUnitAlgebra.
 
 End Instances.
 
@@ -1597,17 +1755,6 @@ HB.instance Definition _ :=
   InvLim_isFieldInvLim.Build _ _ _ _ Sys {invlim Sys}.
 Let test : fieldInvLimType _ := {invlim Sys}.
 End Field.
-
-
-Section TestComUnitAlg.
-Variables (R : pzRingType).
-Variables (disp : _) (I : porderType disp).
-Variable Obj : I -> comUnitAlgType R.
-Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
-Variable Sys : is_invsys bonding.
-Let test1 : algInvLimType _ := {invlim Sys}.
-Let test2 : comUnitRingInvLimType _ := {invlim Sys}.
-End TestComUnitAlg.
 
 
 (***************************************************************************)
