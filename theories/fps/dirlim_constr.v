@@ -13,9 +13,87 @@
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
-(** * Direct limits
+(** * Direct limits in a constructive setting
 
-- {dirlim Sys} == a default implementation of the direct limit of [Sys]
+In the following we use the following notation:
+
+-   I : dirType d == a directed type
+- Obj : I -> Type == a map associating to each i of type I an object of
+                       some category
+-   bonding le_ij == a morphism Obj i -> Obj j where (le_ij : i <= j)
+
+We define the following notion and notations:
+
+is_dirsys bonding == a type for proofs that the bonding morphisms define
+                     a proper direct system.
+     cocone Sys C == C : forall i, Obj i -> T is a co-cone to T for the
+                     system Sys
+      'inj[dlT]_i == the morphim from Obj i -> dlT where dlT is a
+                     direct limit
+'inj[dlT], 'inj_i, 'inj == idem inferring dlT or/and i from the context
+      'ind[dlT] C == the morphism dlT -> T induced by the universal
+                     property where C : cocone Sys C is a cocone to T
+           'ind C == idem where dlT is inferred from the context
+dsysequal Sys u v == u and v maps to the same element in the limit.
+                     u and v are dependant pairs of type {i & Obj i}.
+                     This is an intensional predicate (in Prop).
+
+This file defines the following algebraic structures:
+
+         dirLimType Sys == direct limits of sets (Type)
+                           The HB class is called DirLim
+     nmodDirLimType Sys == direct limits of N-modules
+                           The HB class is called NmoduleDirLim
+     zmodDirLimType Sys == direct limits of Z-modules
+                           The HB class is called ZmoduleDirLim
+pzSemiRingDirLimType Sys == direct limits of semi rings
+                           The HB class is called PzSemiRingDirLim
+nzSemiRingDirLimType Sys == direct limits of non trivial semi rings
+                           The HB class is called NzSemiRingDirLim
+   pzRingDirLimType Sys == direct limits of rings
+                           The HB class is called PzRingDirLim
+   nzRingDirLimType Sys == direct limits of non trivial rings
+                           The HB class is called NzRingDirLim
+comPzSemiRingDirLimType Sys == direct limits of commutative semi rings
+                           The HB class is called ComPzSemiRingDirLim
+comNzSemiRingDirLimType Sys == direct limits of commutative, non trivial
+                           semi rings
+                           The HB class is called ComNzSemiRingDirLim
+comPzRingDirLimType Sys == direct limits of commutative rings
+                           The HB class is called ComPzRingDirLim
+comNzRingDirLimType Sys == direct limits of commutative, non trivial rings
+                           The HB class is called ComNzRingDirLim
+ unitRingDirLimType Sys == direct limits of rings with computable units
+                           The HB class is called UnitRingDirLim
+comUnitRingDirLimType Sys == direct limits of commutative rings with
+                           computable units
+                           The HB class is called ComUnitRingDirLim
+  idomainDirLimType Sys == direct limits of integral, commutative ring
+                           The HB class is called IDomainDirLim
+    fieldDirLimType Sys == direct limits of fields
+                           The HB class is called FieldDirLim
+ lSemiModDirLimType Sys == direct limits of left semimodules. The base
+                           ring is inferred from the system Sys.
+                           The HB class is called LSemiModuleDirLim
+     lmodDirLimType Sys == direct limits of left modules
+                           The HB class is called LmoduleDirLim
+ lSemiAlgDirLimType Sys == direct limits of left semi-algebras
+                           The HB class is called LSemiAlgebraDirLim
+     lalgDirLimType Sys == direct limits of left algebras
+                           The HB class is called LalgebraDirLim
+  semiAlgDirLimType Sys == direct limits of semi-algebras
+                           The HB class is called SemiAlgebraDirLim
+      algDirLimType Sys == direct limits of algebras
+                           The HB class is called AlgebraDirLim
+comSemiAlgDirLimType Sys == direct limits of commutative semi-algebras
+                           The HB class is called ComSemiAlgebraDirLim
+   comAlgDirLimType Sys == direct limits of commutative algebras
+                           The HB class is called ComAlgebraDirLim
+  unitAlgDirLimType Sys == direct limits of algebras with computable units
+                           The HB class is called UnitAlgebraDirLim
+comUnitAlgDirLimType Sys == direct limits of commutative algebras with
+                           computable units
+                           The HB class is called ComUnitAlgebraDirLim
 *******************************************************************************)
 From HB Require Import structures.
 From mathcomp Require Import all_boot ssralg.
@@ -54,12 +132,18 @@ Variables (disp : _) (I : dirType disp).
 (** For example : ringType / rmorphism.                                    *)
 Variable Obj : I -> Type.
 Variable bonding : forall i j, i <= j -> Obj i -> Obj j.
-Record is_dirsys : Type := IsDirSys {
-      dirsys_inh : I;
+Record is_dirsys : Prop := IsDirSys {
+      _ : I;
       dirsys_id i (Hii : i <= i) : (bonding Hii) =1 id;
       dirsys_comp i j k  (Hij : i <= j) (Hjk : j <= k) :
           (bonding Hjk) \o (bonding Hij) =1 (bonding (le_trans Hij Hjk));
   }.
+
+Lemma dirsys_inh : is_dirsys -> I.
+Proof.
+move=> Sys; have ex : exists i : I, true by case: Sys.
+exact: (xchoose ex).
+Qed.
 
 (** Make sure the following definitions depend on the system and not only  *)
 (** on the morphisms. This is needed to triger the unification in the      *)
@@ -443,6 +527,7 @@ Implicit Type x y : dlT.
 HB.instance Definition _ i :=
   GRing.isMonoidMorphism.Build (Obj i) dlT _ (dlinj_is_monoid_morphism i).
 
+(** The universal induced map is a semi-ring morphism *)
 Section UniversalProperty.
 
 Variable (T : pzSemiRingType) (f : forall i, {rmorphism Obj i -> T}).
@@ -498,6 +583,7 @@ HB.structure Definition PzRingDirLim
     & GRing.PzRing dlT
   }.
 
+
 #[short(type="nzRingDirLimType")]
 HB.structure Definition NzRingDirLim
     disp (I : dirType disp)
@@ -508,6 +594,7 @@ HB.structure Definition NzRingDirLim
     dlT of NzSemiRingDirLim disp Sys dlT
     & GRing.NzRing dlT
   }.
+
 
 #[short(type="comPzSemiRingDirLimType")]
 HB.structure Definition ComPzSemiRingDirLim
@@ -520,6 +607,7 @@ HB.structure Definition ComPzSemiRingDirLim
     & PzSemiRingDirLim disp Sys dlT
   }.
 
+
 #[short(type="comNzSemiRingDirLimType")]
 HB.structure Definition ComNzSemiRingDirLim
     disp (I : dirType disp)
@@ -531,6 +619,7 @@ HB.structure Definition ComNzSemiRingDirLim
     & NzSemiRingDirLim disp Sys dlT
   }.
 
+
 #[short(type="comPzRingDirLimType")]
 HB.structure Definition ComPzRingDirLim
     disp (I : dirType disp)
@@ -541,6 +630,7 @@ HB.structure Definition ComPzRingDirLim
     dlT of GRing.ComPzRing dlT
     & PzRingDirLim disp Sys dlT
   }.
+
 
 #[short(type="comNzRingDirLimType")]
 HB.structure Definition ComNzRingDirLim
@@ -575,6 +665,7 @@ Variables
 Variable dlT : unitRingDirLimType Sys.
 Implicit Type (x y z : dlT).
 
+(** Cocone limit morphism send units to units *)
 Lemma dlunitP (x : dlT) :
   reflect
     (exists i (u : Obj i), 'inj u = x /\ u \is a GRing.unit)
@@ -635,6 +726,7 @@ HB.structure Definition FieldDirLim
     & GRing.Field dlT
   }.
 
+
 #[key="dlT"]
 HB.mixin Record isLSemiModuleDirLim
     (R : pzSemiRingType)
@@ -659,7 +751,6 @@ HB.structure Definition LSemiModuleDirLim
     & GRing.LSemiModule R dlT
   }.
 
-
 Section LSemiModuleDirLimTheory.
 
 Variable (R : pzRingType).
@@ -672,7 +763,7 @@ Variable dlT : lSemiModDirLimType Sys.
 HB.instance Definition _ i :=
   GRing.isSemilinear.Build R (Obj i) dlT _ _ (dlinj_is_semilinear i).
 
-(** The universal induced map is a Z-module morphism *)
+(** The universal induced map is a L-semi-module morphism *)
 Section UniversalProperty.
 
 Variable (T : lmodType R) (f : forall i, {linear Obj i -> T}).
@@ -706,6 +797,7 @@ HB.structure Definition LmoduleDirLim
     & GRing.Lmodule R dlT
   }.
 
+
 #[short(type="lSemiAlgDirLimType")]
 HB.structure Definition LSemiAlgebraDirLim
     (R : pzRingType)
@@ -732,6 +824,7 @@ Variable dlT : lSemiAlgDirLimType Sys.
 HB.instance Definition _ i := GRing.Linear.on 'inj[dlT]_i.
 (* Check fun i => 'inj[dlT]_i : {lrmorphism Obj i -> dlT}. *)
 
+(** The universal induced map is a L-semi-algebra morphism *)
 Section UniversalProperty.
 
 Variable (T : lalgType R) (f : forall i, {lrmorphism Obj i -> T}).
@@ -1357,7 +1450,7 @@ HB.factory Record NzRingDirLim_isUnitRingDirLim
     dlunit : dlT -> bool;
     dlunit_decP x : reflect
       (exists i (u : Obj i), 'inj[dlT] u = x /\ u \is a GRing.unit)
-        (dlunit x)
+      (dlunit x)
   }.
 HB.builders Context
     disp (I : dirType disp)
@@ -1714,7 +1807,6 @@ HB.builders Context
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of LalgebraDirLim_isAlgebraDirLim R _ _ _ _ Sys dlT.
-
 HB.instance Definition _ :=
   LSemiAlgebraDirLim_isSemiAlgebraDirLim.Build R _ _ _ _ Sys dlT.
 HB.end.

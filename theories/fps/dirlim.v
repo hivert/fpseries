@@ -15,7 +15,21 @@
 (******************************************************************************)
 (** * Direct limits
 
-- {dirlim Sys} == a default implementation of the direct limit of [Sys]
+This file deal with direct limits in classical logic. The two main ingredients
+are
+
+- isDirLim_classical == a factory for direct limits
+- {dirlim Sys}   == a default implementation of the direct limit of [Sys].
+                    It is automatically endowed with canonical instances
+                    of cat-DirLimType depending on the category in which
+                    the system Sys lives
+
+We also define
+
+- dsyseq Sys u v == a boolean counterpart of dsysequal Sys u v meaning that
+                    u and v maps to the same element in the limit.
+                    u and v are dependant pairs of type {i & Obj i}.
+
 *******************************************************************************)
 From HB Require Import structures.
 From mathcomp Require Import all_boot ssralg.
@@ -203,14 +217,13 @@ Definition dlunit x :=
 Fact dlunit_decP x : reflect
   (exists i (u : Obj i), 'inj[dlT] u = x /\ u \is a GRing.unit) (dlunit x).
 Proof.
-apply (iffP (asboolP _)) => [[inv /andP[/eqP {x}<- Hunit]] | [i][inv] [Heq Hunit]].
+apply (iffP (asboolP _)) => [[inv /andP[/eqP {x}<- Hunit]] |
+                              [i][inv] [Heq Hunit]].
   by exists (tag inv); exists (projT2 inv).
 by exists (existT _ i inv); rewrite Heq eqxx.
 Qed.
-
 HB.instance Definition _ :=
   NzRingDirLim_isUnitRingDirLim.Build _ _ _ _ Sys dlT dlunit_decP.
-
 HB.end.
 
 
@@ -226,7 +239,6 @@ HB.builders Context
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of DirLim_isComUnitRingDirLim _ _ _ _ Sys dlT.
-
 HB.instance Definition _ := DirLim_isUnitRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
   PzSemiRingDirLim_isComPzSemiRingDirLim.Build _ _ _ _ Sys dlT.
@@ -245,14 +257,10 @@ HB.builders Context
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of DirLim_isIDomainDirLim _ _ _ _ Sys dlT.
-
-Implicit Type x y : dlT.
-
 HB.instance Definition _ :=
   DirLim_isComUnitRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
   ComUnitRingDirLim_isIntegralDirLim.Build _ _ _ _ Sys dlT.
-
 HB.end.
 
 
@@ -268,12 +276,10 @@ HB.builders Context
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of DirLim_isFieldDirLim _ _ _ _ Sys dlT.
-
 HB.instance Definition _ :=
   DirLim_isIDomainDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
   IDomainDirLim_isFieldDirLim.Build _ _ _ _ Sys dlT.
-
 HB.end.
 
 Close Scope ring_scope.
@@ -548,6 +554,7 @@ Variables (disp : _) (I : dirType disp).
 Variable Obj : I -> comUnitAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
+Let test : comUnitAlgDirLimType _ := {dirlim Sys}.
 Let test1 : algDirLimType _ := {dirlim Sys}.
 Let test2 : comUnitRingDirLimType _ := {dirlim Sys}.
 End TestComUnitAlg.
