@@ -96,10 +96,9 @@ We prove the [Lagrange_Bürmann] theorem giving the coefficent of the Lagrange
 fixpoint and its compose series.
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot.
+From mathcomp Require Import all_boot order.
 From mathcomp Require Import ssralg poly ring_quotient (* avoid sesquilinear *).
 From mathcomp Require Import boolp classical_sets.
-From mathcomp Require Import order.
 
 Require Import auxresults natbar directed tfps invlim.
 

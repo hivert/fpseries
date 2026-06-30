@@ -96,8 +96,7 @@ comUnitAlgDirLimType Sys == direct limits of commutative algebras with
                            The HB class is called ComUnitAlgebraDirLim
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
-From mathcomp Require Import order bigop.
+From mathcomp Require Import all_boot order ssralg.
 
 Require Import natbar directed.
 

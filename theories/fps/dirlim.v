@@ -32,8 +32,8 @@ We also define
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
-From mathcomp Require Import order boolp classical_sets.
+From mathcomp Require Import all_boot order ssralg.
+From mathcomp Require Import boolp classical_sets.
 
 Require Import natbar directed dirlim_constr.
 
