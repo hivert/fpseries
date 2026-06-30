@@ -19,6 +19,10 @@
  # *)
 (** * Truncated power series, i.e. polynomials modulo X^n
 
+This is heavily inspired from
+
+https://github.com/Barbichu/newtonsums
+
 In this file, we suppose that \(\mathbf{R}\) is a ring and \(n\) is a positive
 integer.  The goal of this file is to construct the ring
 #\(\mathbf{R}[X]/X^n\)#.
@@ -101,8 +105,9 @@ is infinite, and MathComp currently formalize only finite groups.
 We prove the [Lagrange_Bürmann] theorem giving the coefficent of the Lagrange
 fixpoint and its compose series.
 *******************************************************************************)
+From Corelib Require Import Setoid.
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot.
 From mathcomp Require Import ssralg poly polydiv ring_quotient.
 Require Import auxresults.
 
@@ -123,7 +128,7 @@ Reserved Notation "[ 'tfps' s <= n => F ]"
   (at level 0, n at next level, s name, format "[ 'tfps' s <= n  =>  F ]").
 Reserved Notation "[ 'tfps' s => F ]"
   (at level 0, s name, format "[ 'tfps'  s  =>  F ]").
-Reserved Notation "c %:S" (at level 2, format "c %:S").
+Reserved Notation "c %:S" (at level 1, format "c %:S").
 Reserved Notation "\X" (at level 0).
 Reserved Notation "\Xo( n )" (at level 0).
 Reserved Notation "x ^^ n" (at level 29, left associativity).
@@ -187,7 +192,7 @@ End MoreBigop.
 
 Section MorePolyTheory.
 
-Variable R : ringType.
+Variable R : nzSemiRingType.
 Implicit Type p q : {poly R}.
 
 Lemma poly_cat p n :
@@ -225,7 +230,7 @@ move/eqp_dvdr=> p_eqp_q.
 by apply/eqP/eqP => /polyXP; [rewrite p_eqp_q | rewrite -p_eqp_q] => /polyXP.
 Qed.
 
-Hypothesis char_K_is_zero : [char K] =i pred0.
+Hypothesis char_K_is_zero : [pchar K] =i pred0.
 
 Lemma size_deriv (p : {poly K}) : size (p^`()%R) = (size p).-1.
 Proof.
@@ -234,7 +239,7 @@ have [/size1_polyC -> | le_sp_1] := ltnP (size p) 2.
 rewrite size_poly_eq // !prednK ; last by case: (size p) le_sp_1.
 rewrite -mulr_natr mulf_eq0 ; apply/norP ; split.
   by rewrite -lead_coefE lead_coef_eq0 -size_poly_gt0 (ltn_trans _ le_sp_1).
-move/(charf0P K) : char_K_is_zero => ->; rewrite -lt0n.
+move/(pcharf0P K) : char_K_is_zero => ->; rewrite -lt0n.
 by case: (size p) le_sp_1.
 Qed.
 
@@ -250,7 +255,7 @@ End MorePolyTheory.
 
 Section TruncFPSDef.
 
-Variable R : ringType.
+Variable R : nzSemiRingType.
 Variable n : nat.
 
 Implicit Types (p q r s : {poly R}).
@@ -294,7 +299,7 @@ Hint Resolve size_tfps : core.
 
 Section CoefTFPS.
 
-Variable R : ringType.
+Variable R : nzSemiRingType.
 Variable n : nat.
 
 Implicit Types (p q r s : {poly R}) (f g : {tfps R n}).
@@ -407,9 +412,9 @@ Notation "\X" := (trXn _ 'X) : tfps_scope.
 Notation "\Xo( n )" := (trXn n 'X) (only parsing): tfps_scope.
 
 
-Section TFPSTheory.
+Section TFPSSemiRingTheory.
 
-Variable (R : ringType).
+Variable (R : nzSemiRingType).
 Implicit Types (p q r s : {poly R}).
 
 Fact trXnC n a : tfps (trXn n a%:P) = a%:P :> {poly R}.
@@ -447,9 +452,9 @@ Lemma trXn_mul p q :
   trXn n (tfps (trXn n p) * tfps (trXn n q)) = trXn n (p * q).
 Proof. by rewrite trXn_mulr trXn_mull. Qed.
 
+(* nmodType structure *)
 
-(* zmodType structure *)
-Implicit Types (f g : {tfps R n}).
+Implicit Types (f g : {tfps R n }).
 
 Fact zero_tfps_subproof : size (0 : {poly R}) <= n.+1.
 Proof. by rewrite size_poly0. Qed.
@@ -457,12 +462,9 @@ Definition zero_tfps := MkTfps zero_tfps_subproof.
 
 Fact add_tfps_subproof f g :
   size (tfps f + tfps g) <= n.+1.
-Proof. by rewrite (leq_trans (size_add _ _)) // geq_max !size_tfps. Qed.
+Proof. by rewrite (leq_trans (size_polyD _ _)) // geq_max !size_tfps. Qed.
 Definition add_tfps f g := MkTfps (add_tfps_subproof f g).
 
-Fact opp_tfps_subproof f : size (- tfps f) <= n.+1.
-Proof. by rewrite size_opp ?size_tfps. Qed.
-Definition opp_tfps f := MkTfps (opp_tfps_subproof f).
 
 Fact add_tfpsA : associative add_tfps.
 Proof. by move => f1 f2 f3; apply/tfps_inj/addrA. Qed.
@@ -470,18 +472,17 @@ Fact add_tfpsC : commutative add_tfps.
 Proof. by move => f1 f2; apply/tfps_inj/addrC. Qed.
 Fact add_0tfps : left_id zero_tfps add_tfps.
 Proof. by move => f; apply/tfps_inj/add0r. Qed.
-Fact add_Ntfps : left_inverse zero_tfps opp_tfps add_tfps.
-Proof. by move => f; apply/tfps_inj/addNr. Qed.
 HB.instance Definition _ :=
-    GRing.isZmodule.Build {tfps R n} add_tfpsA add_tfpsC add_0tfps add_Ntfps.
+    GRing.isNmodule.Build {tfps R n} add_tfpsA add_tfpsC add_0tfps.
 
-
-Fact trXn_is_additive : additive (trXn n).
+Fact trXn_is_nmod_morphism : nmod_morphism (trXn n).
 Proof.
-by move=> f g; apply/tfpsP => i Hi; rewrite coefB !coef_trXn coefB Hi.
+split => [| f g]; apply/tfpsP => i Hi.
+  by rewrite coef0 !coef_trXn coef0 Hi.
+by rewrite coefD !coef_trXn coefD Hi.
 Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly R} {tfps R n} (trXn n) trXn_is_additive.
+  GRing.isNmodMorphism.Build {poly R} {tfps R n} (trXn n) trXn_is_nmod_morphism.
 
 Lemma coeft0 i : (0 : {tfps R n})`_i = 0.
 Proof. by rewrite coef0. Qed.
@@ -489,42 +490,37 @@ Proof. by rewrite coef0. Qed.
 Lemma trXn0 : trXn n 0 = 0.
 Proof. exact: raddf0. Qed.
 
-Fact tfps_is_additive : additive (tfps : {tfps R n} -> {poly R}).
+Fact tfps_is_nmod_morphism : nmod_morphism (tfps : {tfps R n} -> {poly R}).
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {tfps R n} {poly R} _ tfps_is_additive.
+  GRing.isNmodMorphism.Build {tfps R n} {poly R} _ tfps_is_nmod_morphism.
 
-Fact tfpsC_is_additive : additive (@tfpsC R n : R -> {tfps R n}).
+Fact tfpsC_is_nmod_morphism : nmod_morphism (@tfpsC R n : R -> {tfps R n}).
 Proof.
-move=> c1 c2; apply tfps_inj.
-by rewrite !val_tfpsC !raddfB /= !val_tfpsC.
+split => [| c1 c2]; apply tfps_inj.
+  by rewrite !val_tfpsC.
+by rewrite !val_tfpsC !raddfD /= !val_tfpsC.
 Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build R {tfps R n} _ tfpsC_is_additive.
+  GRing.isNmodMorphism.Build R {tfps R n} _ tfpsC_is_nmod_morphism.
 
 Lemma tfpsC0 : (0%:S : {tfps R n}) = 0.
 Proof. exact: raddf0. Qed.
 Lemma tfpsCB : {morph (@tfpsC R n) : a b / a + b}.
 Proof. exact: raddfD. Qed.
-Lemma tfpsCN : {morph (@tfpsC R n) : c / - c}.
-Proof. exact: raddfN. Qed.
-Lemma tfpsCD : {morph (@tfpsC R n) : a b / a - b}.
-Proof. exact: raddfB. Qed.
 Lemma tfpsC_sum I (r : seq I) (s : pred I) (F : I -> R) :
   (\sum_(i <- r | s i) F i)%:S = \sum_(i <- r | s i) (F i)%:S.
 Proof. exact: raddf_sum. Qed.
 
 Lemma tfpsCMn m : {morph (@tfpsC R n) : c / c *+ m}.
 Proof. exact: raddfMn. Qed.
-Lemma tfpsCMNn m : {morph (@tfpsC R n) : c / c *- m}.
-Proof. exact: raddfMNn. Qed.
-
 
 Lemma tfpsC_eq0 (c : R) : (c%:S == 0 :> {tfps R n}) = (c == 0).
 Proof. by rewrite -tfpsC0; apply/inj_eq/tfpsC_inj. Qed.
 
 
-(* ringType structure *)
+
+(* semiRingType structure *)
 Fact one_tfps_proof : size (1 : {poly R}) <= n.+1.
 Proof. by rewrite size_polyC (leq_trans (leq_b1 _)). Qed.
 Definition one_tfps : {tfps R n} := MkTfps one_tfps_proof.
@@ -554,10 +550,16 @@ Fact mul_tfpsDl : left_distributive mul_tfps +%R.
 Proof. by move=> f1 f2 f3; rewrite /mul_tfps mulrDl raddfD. Qed.
 Fact mul_tfpsDr : right_distributive mul_tfps +%R.
 Proof. by move=> f1 f2 f3; rewrite /mul_tfps mulrDr raddfD. Qed.
+Fact mul_0tfps : left_zero 0 mul_tfps.
+Proof. by move=> f; rewrite /mul_tfps -trXn_mul trXn0 raddf0 mul0r trXn0. Qed.
+Fact mul_tfps0 : right_zero 0 mul_tfps.
+Proof. by move=> f; rewrite /mul_tfps -trXn_mul trXn0 raddf0 mulr0 trXn0. Qed.
 Fact one_tfps_neq0 : one_tfps != 0.
 Proof. by rewrite -val_eqE oner_neq0. Qed.
-HB.instance Definition _ := GRing.Zmodule_isRing.Build {tfps R n}
-  mul_tfpsA mul_1tfps mul_tfps1 mul_tfpsDl mul_tfpsDr one_tfps_neq0.
+
+HB.instance Definition _ := GRing.Nmodule_isNzSemiRing.Build {tfps R n}
+  mul_tfpsA mul_1tfps mul_tfps1 mul_tfpsDl mul_tfpsDr
+  mul_0tfps mul_tfps0 one_tfps_neq0.
 
 Lemma coeft1 i : (1 : {tfps R n})`_i = (i == 0%N)%:R.
 Proof. by rewrite coef1. Qed.
@@ -565,10 +567,10 @@ Proof. by rewrite coef1. Qed.
 Lemma trXn1 : trXn n 1 = 1.
 Proof. by apply/tfpsP => i Hi; rewrite coef_trXn Hi. Qed.
 
-Fact trXn_is_multiplicative : multiplicative (@trXn R n).
-Proof. by split => [f g|] /=; [rewrite -trXn_mul | rewrite trXn1]. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build {poly R} {tfps R n}
-                              (trXn n) trXn_is_multiplicative.
+Fact trXn_is_monoid_morphism : monoid_morphism (@trXn R n).
+Proof. by split => [|f g] /=; [rewrite trXn1 | rewrite -trXn_mul]. Qed.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build {poly R} {tfps R n}
+                              (trXn n) trXn_is_monoid_morphism.
 
 Lemma mul_tfps_val f g : f * g = trXn n (tfps f * tfps g).
 Proof. by []. Qed.
@@ -587,16 +589,15 @@ elim: m => [|m IHm]; first by rewrite !expr0 trXn1.
 by rewrite exprS {}IHm /= !rmorphXn /= tfpsK -exprS.
 Qed.
 
-Fact tfpsC_is_multiplicative :
-  multiplicative (@tfpsC R n : R -> {tfps R n}).
+Fact tfpsC_is_monoid_morphism : monoid_morphism (@tfpsC R n : R -> {tfps R n}).
 Proof.
-split => [c1 c2|]; last by rewrite tfpsCE trXn1.
+split => [|c1 c2]; first by rewrite tfpsCE trXn1.
 apply tfps_inj; rewrite mul_tfps_val !val_tfpsC -rmorphM /=.
 apply/polyP => i; rewrite coef_tfps coef_trXn coefC; case: i => //= i.
 by rewrite !if_same.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build R {tfps R n} (tfpsC n) tfpsC_is_multiplicative.
+  GRing.isMonoidMorphism.Build R {tfps R n} (tfpsC n) tfpsC_is_monoid_morphism.
 
 Lemma tfpsC1 : (1%:S : {tfps R n}) = 1.
 Proof. exact: rmorph1. Qed.
@@ -612,34 +613,39 @@ Lemma tfpsC_eq1 (c : R) : (c%:S == 1 :> {tfps R n}) = (c == 1).
 Proof. by rewrite -tfpsC1; apply/inj_eq/tfpsC_inj. Qed.
 
 
-(* lmodType structure *)
+(* lSemiModType structure *)
 Fact scale_tfps_subproof (c : R) f : size (c *: val f) <= n.+1.
 Proof. exact: leq_trans (size_scale_leq _ _) (size_tfps _). Qed.
 Definition scale_tfps (c : R) f := MkTfps (scale_tfps_subproof c f).
 
 Fact scale_tfpsA a b v : scale_tfps a (scale_tfps b v) = scale_tfps (a * b) v.
 Proof. by apply/tfpsP => i le_in /=; rewrite !coefZ mulrA. Qed.
+Fact scale_0tfps v : scale_tfps 0 v = 0.
+Proof. by apply/tfpsP => i le_in; rewrite coef_tfpsE /= scale0r. Qed.
 Fact scale_1tfps : left_id 1 scale_tfps.
 Proof. by move=> x; apply/tfpsP => i le_in; rewrite coef_tfpsE /= scale1r. Qed.
 Fact scale_tfpsDr : right_distributive scale_tfps +%R.
 Proof. by move=> r x y; apply/tfpsP => i; rewrite coef_tfpsE /= scalerDr. Qed.
 Fact scale_tfpsDl v : {morph scale_tfps^~ v: a b / a + b}.
 Proof. by move=> r s; apply/tfpsP => i; rewrite coef_tfpsE /= scalerDl. Qed.
-HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R {tfps R n}
-  scale_tfpsA scale_1tfps scale_tfpsDr scale_tfpsDl.
 
-Fact trXn_is_linear : linear (@trXn R n).
+HB.instance Definition _ := GRing.Nmodule_isLSemiModule.Build R {tfps R n}
+  scale_tfpsA scale_0tfps scale_1tfps scale_tfpsDr scale_tfpsDl.
+
+Fact trXn_is_semilinear : semilinear (@trXn R n).
 Proof.
-move=> c f g; apply/tfpsP => i Hi.
-by rewrite !(coefD, coefZ, coef_trXn) Hi.
+by split=> [c f | f g]; apply/tfpsP => i Hi;
+     rewrite !(coefD, coefZ, coef_trXn) Hi.
 Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R {poly R} {tfps R n} _ (trXn n) trXn_is_linear.
+  GRing.isSemilinear.Build
+    R {poly R} {tfps R n} _ (trXn n) trXn_is_semilinear.
 
-Fact tfps_is_linear : linear (tfps : {tfps R n} -> {poly R}).
+Fact tfps_is_semilinear : semilinear (tfps : {tfps R n} -> {poly R}).
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R {tfps R n} {poly R} _ (@tfps R n) tfps_is_linear.
+  GRing.isSemilinear.Build
+    R {tfps R n} {poly R} _ (@tfps R n) tfps_is_semilinear.
 
 
 (* lalgType structure *)
@@ -648,12 +654,7 @@ Proof.
 by apply tfps_inj; rewrite /= -linearZ  /= !mul_tfps_val -scalerAl linearZ.
 Qed.
 HB.instance Definition _ :=
-  GRing.Lmodule_isLalgebra.Build R {tfps R n} scale_tfpsAl.
-
-(* Q: Is something needed here ??
-Canonical trXn_lrmorphism :=
-  Eval hnf in AddLRMorphism trXn_is_linear.
-*)
+  GRing.LSemiModule_isLSemiAlgebra.Build R {tfps R n} scale_tfpsAl.
 
 Lemma alg_tfpsC (c : R) : c%:A = c%:S.
 Proof. by apply/tfps_inj; rewrite {1}val_tfpsC -alg_polyC. Qed.
@@ -695,25 +696,17 @@ Qed.
 Lemma coeftfpsE f i : coeftfps i f = coefp i (tfps f).
 Proof. by rewrite /= coef_tfpsE. Qed.
 
-Lemma coeftB f g i : (f - g)`_i = f`_i - g`_i.
-Proof. by rewrite coefB. Qed.
+Lemma coeftD i : nmod_morphism (fun f => f`_i).
+Proof. by split => [| f g]; rewrite ?coef0 ?coefD. Qed.
 
-HB.instance Definition _ i := GRing.isAdditive.Build {tfps R n} R (coeftfps i)
-  (fun p : {tfps R n} => (coeftB p)^~ i).
+HB.instance Definition _ i :=
+  GRing.isNmodMorphism.Build {tfps R n} R (coeftfps i) (coeftD i).
 
-
-Lemma coeftD f g i : (f + g)`_i = f`_i + g`_i.
-Proof. exact: (raddfD (coeftfps i)). Qed.
-Lemma coeftN f i : (- f)`_i = - f`_i.
-Proof. exact: (raddfN (coeftfps i)). Qed.
 Lemma coeftMn f k i : (f *+ k)`_i = f`_i *+ k.
 Proof. exact: (raddfMn (coeftfps i)). Qed.
-Lemma coeftMNn f k i : (f *- k)`_i = f`_i *- k.
-Proof. exact: (raddfMNn (coeftfps i)). Qed.
 Lemma coeft_sum I (r : seq I) (P : pred I) (F : I -> {tfps R n}) k :
   (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
 Proof. exact: (raddf_sum (coeftfps k)). Qed.
-
 
 Fact coeftfps_is_linear i :
   scalable_for *%R (coeftfps i : {tfps R n} -> R).
@@ -724,29 +717,66 @@ HB.instance Definition _ i :=
 Lemma coeftZ a f i : (a *: f)`_i = a * f`_i.
 Proof. exact: (scalarZ (coeftfps i)). Qed.
 
-
-Fact coeftfps0_is_multiplicative :
-  multiplicative (coeftfps 0 : {tfps R n} -> R).
+Fact coeftfps0_is_monoid_morphism :
+  monoid_morphism (coeftfps 0 : {tfps R n} -> R).
 Proof.
-split=> [p q|]; rewrite !coeftfpsE; last by rewrite polyCK.
+split=> [|p q]; rewrite !coeftfpsE; first by rewrite polyCK.
 rewrite mul_tfps_val /= -!/(_`_0) coef_trXn /= -!/(_`_0) -!/(coefp 0 _).
 by rewrite rmorphM.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build
-    {tfps R n} R (coeftfps 0) coeftfps0_is_multiplicative.
+  GRing.isMonoidMorphism.Build
+    {tfps R n} R (coeftfps 0) coeftfps0_is_monoid_morphism.
 
 Fact coeft0M f g : (f * g)`_0 = f`_0 * g`_0.
 Proof. exact: (rmorphM (coeftfps 0)). Qed.
 Fact coeft0X f i : (f ^+ i)`_0 = f`_0 ^+ i.
 Proof. exact: (rmorphXn (coeftfps 0)). Qed.
+Fact coeft0_prod I (r : seq I) (P : pred I) (F : I -> {tfps R n}) :
+  (\prod_(i <- r | P i) F i)`_0 = \prod_(i <- r | P i) (F i)`_0.
+Proof. exact: (rmorph_prod (coeftfps 0)). Qed.
 
-End TFPSTheory.
+End TFPSSemiRingTheory.
+
+
+Section TFPSRingTheory.
+
+Variable (R : nzRingType) (n : nat).
+Implicit Types (p q r s : {poly R}).
+Implicit Types (f g : {tfps R n}).
+
+
+(* zmodType structure *)
+Fact opp_tfps_subproof f : size (- tfps f) <= n.+1.
+Proof. by rewrite size_polyN ?size_tfps. Qed.
+Definition opp_tfps f := MkTfps (opp_tfps_subproof f).
+
+Fact add_Ntfps : left_inverse 0 opp_tfps (+%R).
+Proof. by move => f; apply/tfps_inj/addNr. Qed.
+HB.instance Definition _ :=
+    GRing.Nmodule_isZmodule.Build {tfps R n} add_Ntfps.
+
+Lemma tfpsCN : {morph (@tfpsC R n) : c / - c}.
+Proof. exact: raddfN. Qed.
+Lemma tfpsCD : {morph (@tfpsC R n) : a b / a - b}.
+Proof. exact: raddfB. Qed.
+
+Lemma tfpsCMNn m : {morph (@tfpsC R n) : c / c *- m}.
+Proof. exact: raddfMNn. Qed.
+
+Lemma coeftB f g i : (f - g)`_i = f`_i - g`_i.
+Proof. by rewrite coefB. Qed.
+Lemma coeftN f i : (- f)`_i = - f`_i.
+Proof. exact: (raddfN (coeftfps i)). Qed.
+Lemma coeftMNn f k i : (f *- k)`_i = f`_i *- k.
+Proof. exact: (raddfMNn (coeftfps i)). Qed.
+
+End TFPSRingTheory.
 
 
 Section TrXnT.
 
-Variable R : ringType.
+Variable R : nzSemiRingType.
 
 Definition trXnt m n : {tfps R m} -> {tfps R n} :=
   @trXn R n  \o  @tfps R m.
@@ -782,28 +812,28 @@ Proof. exact: trXn0. Qed.
 Lemma trXnt1 : @trXnt m n 1 = 1.
 Proof. exact: trXn1. Qed.
 
-Fact trXnt_is_linear : linear (@trXnt m n).
-Proof. by move=> c f g; rewrite !trXntE !linearP. Qed.
+Fact trXnt_is_semilinear : semilinear (@trXnt m n).
+Proof. by split=> [c f | f g]; rewrite !trXntE ?linearD ?linearZ. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R {tfps R m} {tfps R n} _ (@trXnt m n) trXnt_is_linear.
+  GRing.isSemilinear.Build R {tfps R m} {tfps R n} _ (@trXnt m n)
+    trXnt_is_semilinear.
 
 Hypothesis H : n <= m.
-Fact trXnt_is_multiplicative : multiplicative (@trXnt m n).
+Fact trXnt_is_monoid_morphism : monoid_morphism (@trXnt m n).
 Proof.
-split=> [f g|] /=; last exact trXnt1.
-rewrite /trXnt /= mul_tfps_val /=.
-by rewrite -rmorphM /= trXn_trXn.
+split=> [|f g] /=; first exact trXnt1.
+by rewrite /trXnt /= mul_tfps_val /= -rmorphM /= trXn_trXn.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build
-    {tfps R m} {tfps R n} (@trXnt m n) trXnt_is_multiplicative.
+  GRing.isMonoidMorphism.Build
+    {tfps R m} {tfps R n} (@trXnt m n) trXnt_is_monoid_morphism.
 
 End TrXnT.
 
 
 Section TestTrXnT.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Variables (m n p : nat).
 Implicit Type (f g : {tfps R m}).
 
@@ -813,6 +843,9 @@ Proof. by rewrite linear0. Qed.
 
 Example trXn_tfps1 : trXn n (tfps (1 : {tfps R m})) = 1.
 Proof. by rewrite rmorph1. Qed.
+
+Example trXntD f g : trXnt n (f - g) = trXnt n f - trXnt n g.
+Proof. by rewrite linearB. Qed.
 
 Example trXntZ c f : trXnt n (c *: f) =  c *: (trXnt n f).
 Proof. by rewrite linearZ. Qed.
@@ -829,7 +862,7 @@ End TestTrXnT.
 
 Section TFPSX.
 
-Variable (R : ringType) (n : nat).
+Variable (R : nzSemiRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
 Lemma tfps0X m : m = 0%N -> \Xo(m) = 0 :> {tfps R m}.
@@ -934,7 +967,7 @@ End TFPSX.
 
 Section TFPSConvRing.
 
-Variable (R : ringType) (n : nat).
+Variable (R : nzSemiRingType) (n : nat).
 
 Fact size_convr_subproof (f : {tfps R n}) :
   size (map_poly (fun c : R => c : R^c) (tfps f)) <= n.+1.
@@ -946,19 +979,23 @@ Fact size_iconvr_subproof (f : {tfps R^c n}) :
 Proof. by rewrite size_map_inj_poly ?size_tfps. Qed.
 Definition iconvr_tfps f : {tfps R n} := MkTfps (size_iconvr_subproof f).
 
-Fact convr_tfps_is_additive : additive convr_tfps.
+Fact convr_tfps_is_nmod_morphism : nmod_morphism convr_tfps.
 Proof.
-by move=> f g; apply/tfpsP => i _; rewrite /= coefB !coef_map_id0 // coefB.
+split => [|f g] ; apply/tfpsP => i _.
+  by rewrite coef0 !coef_map_id0 // coef0.
+by rewrite /= coefD !coef_map_id0 // coefD.
 Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build _ _ convr_tfps convr_tfps_is_additive.
+  GRing.isNmodMorphism.Build _ _ convr_tfps convr_tfps_is_nmod_morphism.
 
-Fact iconvr_tfps_is_additive : additive iconvr_tfps.
+Fact iconvr_tfps_is_nmod_morphism : nmod_morphism iconvr_tfps.
 Proof.
-by move=> f g; apply/tfpsP => i _; rewrite /= coefB !coef_map_id0 // coefB.
+split => [|f g] ; apply/tfpsP => i _.
+  by rewrite coef0 !coef_map_id0 // coef0.
+by rewrite /= coefD !coef_map_id0 // coefD.
 Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build _ _ iconvr_tfps iconvr_tfps_is_additive.
+  GRing.isNmodMorphism.Build _ _ iconvr_tfps iconvr_tfps_is_nmod_morphism.
 
 Lemma convr_tfpsK : cancel convr_tfps iconvr_tfps.
 Proof. by move=> f; apply/tfpsP => i _; rewrite !coef_map_id0. Qed.
@@ -998,18 +1035,18 @@ Definition unit_tfps : pred {tfps R n} := fun f => f`_0 \in GRing.unit.
 Fixpoint inv_tfps_rec f bound m :=
   if bound is b.+1 then
     if (m <= b)%N then inv_tfps_rec f b m
-    else -f`_0%N^-1 * (\sum_(i < m) f`_i.+1 * (inv_tfps_rec f b (m - i.+1)%N))
-  else f`_0%N^-1.
+    else -(f`_0%N)^-1 * (\sum_(i < m) f`_i.+1 * (inv_tfps_rec f b (m - i.+1)%N))
+  else (f`_0%N)^-1.
 Definition inv_tfps f : {tfps R n} :=
   if unit_tfps f then [tfps i <= n => inv_tfps_rec f i i] else f.
 
-Lemma coef0_inv_tfps f : unit_tfps f -> (inv_tfps f)`_0 = f`_0^-1.
+Lemma coef0_inv_tfps f : unit_tfps f -> (inv_tfps f)`_0 = (f`_0)^-1.
 Proof. by rewrite /inv_tfps => ->; rewrite coef_tfps_of_fun. Qed.
 
 Lemma coefS_inv_tfps f m :
   unit_tfps f -> m < n ->
   (inv_tfps f)`_m.+1 =
-  - f`_0%N^-1 *
+  - (f`_0%N)^-1 *
     (\sum_(i < m.+1) f`_i.+1 * (inv_tfps f)`_(m - i)%N).
 Proof.
 move=> s_unit lt_mn.
@@ -1078,7 +1115,7 @@ rewrite coef1 coeft0M => Hr.
 by rewrite /unit_tfps; apply/unitrP; exists g`_0.
 Qed.
 HB.instance Definition _ :=
-  GRing.Ring_hasMulInverse.Build
+  GRing.NzRing_hasMulInverse.Build
     {tfps R n} mul_tfpsrV (@mul_tfpsVr R n) unit_tfpsP (@inv_tfps0id R n).
 
 
@@ -1098,8 +1135,8 @@ Qed.
 
 Lemma coeftV f i : f \is a GRing.unit -> f^-1`_i =
   if i > n then 0 else
-  if i == 0%N then f`_0 ^-1
-  else - (f`_0 ^-1) * (\sum_(j < i) f`_j.+1 * f^-1`_(i - j.+1)).
+  if i == 0%N then (f`_0)^-1
+  else - (f`_0) ^-1 * (\sum_(j < i) f`_j.+1 * f^-1`_(i - j.+1)).
 Proof.
 move=> funit; case: ltnP => Hi.
   by rewrite -(tfpsK f^-1) coef_trXnt (ltn_geF Hi).
@@ -1142,23 +1179,34 @@ Qed.
 End TruncFPSTheoryUnitRing.
 
 
-Section TFPSComRing.
+Section TFPSComSemiRing.
 
-Variable (R : comRingType) (n : nat).
+Variable (R : comNzSemiRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
 Fact mul_tfpsC f g : f * g = g * f.
 Proof. by rewrite !mul_tfps_val mulrC. Qed.
 HB.instance Definition _ :=
-  GRing.Ring_hasCommutativeMul.Build {tfps R n} mul_tfpsC.
+  GRing.PzSemiRing_hasCommutativeMul.Build {tfps R n} mul_tfpsC.
 
 (* Q: why is this needed ??? *)
-HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R {tfps R n}.
-(* Check {tfps R n} : comAlgType R. *)
+HB.instance Definition _ :=
+  GRing.LSemiAlgebra_isComSemiAlgebra.Build R {tfps R n}.
+Let check := {tfps R n} : comSemiAlgType R.
 
 Lemma hmul_tfpsC : commutative (@hmul_tfps R n).
 Proof. by move=> f1 f2; apply/tfpsP => i; rewrite !coef_poly mulrC. Qed.
 
+End TFPSComSemiRing.
+
+
+Section TFPSComRing.
+
+Variable (R : comNzRingType) (n : nat).
+
+HB.instance Definition _ := GRing.ComNzSemiRing.on {tfps R n}.
+
+(* Check {tfps R n} : comAlgType R. *)
 End TFPSComRing.
 
 
@@ -1168,7 +1216,7 @@ Variable (R : comUnitRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
 (* Rebuilt the various instances on a comUnitRingType base ring. *)
-HB.instance Definition _ := GRing.ComRing.on {tfps R n}.
+HB.instance Definition _ := GRing.ComNzRing.on {tfps R n}.
 
 End TFPSComUnitRing.
 
@@ -1185,17 +1233,17 @@ rewrite -{1}(poly_cat p n) addrC mulrC Pdiv.IdomainUnit.modp_addl_mul_small //.
   by rewrite size_take -/(minn _ _) geq_minl.
 Qed.
 
-Lemma trXn_modE m (p : {poly R}) : p %% 'X^m.+1 = tfps (trXn m p).
+Lemma trXn_modE m (p : {poly R}) : p %% 'X^(m.+1) = tfps (trXn m p).
 Proof. by apply/val_inj => /=; rewrite trXnE poly_modXn. Qed.
 
 Fact tfps_modp (n m : nat) (p : {poly R}) : n <= m ->
-  trXn n (p %% 'X^m.+1) = trXn n p.
+  trXn n (p %% 'X^(m.+1)) = trXn n p.
 Proof. by move=> lt_nm; apply/val_inj; rewrite /= trXn_modE trXn_trXn. Qed.
 
 Variable n : nat.
 Implicit Types (f g : {tfps R n}).
 
-Fact mod_tfps (m : nat) f : n <= m -> (tfps f) %% 'X^m.+1 = (tfps f).
+Fact mod_tfps (m : nat) f : n <= m -> (tfps f) %% 'X^(m.+1) = (tfps f).
 Proof.
 move=> leq_nm.
 by rewrite modp_small // size_polyXn ltnS (leq_trans (size_tfps _)).
@@ -1206,7 +1254,7 @@ End TFPSIDomain.
 
 Section MapTFPS.
 
-Variables (K L : ringType) (n : nat) (F : {rmorphism K -> L}).
+Variables (K L : nzSemiRingType) (n : nat) (F : {rmorphism K -> L}).
 
 Implicit Type g h : {tfps K n}.
 
@@ -1227,10 +1275,11 @@ apply eq_bigr => [] [j]; rewrite /= ltnS => le_ji _.
 by rewrite rmorphM !coef_map_tfps.
 Qed.
 
-Fact map_tfps_is_additive : additive map_tfps.
-Proof. by move => x y; apply/tfps_inj => /=; rewrite rmorphB. Qed.
+Fact map_tfps_is_nmod_morphism : nmod_morphism map_tfps.
+Proof. by split=> [|x y]; apply/tfps_inj => /=; rewrite ?raddf0 ?rmorphD. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {tfps K n} {tfps L n} map_tfps map_tfps_is_additive.
+  GRing.isNmodMorphism.Build
+    {tfps K n} {tfps L n} map_tfps map_tfps_is_nmod_morphism.
 
 Lemma map_tfpsZ (c : K) g : map_tfps (c *: g) = (F c) *: (map_tfps g).
 Proof. by apply/tfpsP => i le_in; rewrite coef_tfpsE /= map_polyZ. Qed.
@@ -1238,14 +1287,14 @@ HB.instance Definition _ i :=
   GRing.isScalable.Build _ {tfps K n} {tfps L n} _ map_tfps
     (map_tfpsZ : scalable_for (F \; *:%R) map_tfps).
 
-Fact map_tfps_is_multiplicative : multiplicative map_tfps.
+Fact map_tfps_is_monoid_morphism : monoid_morphism map_tfps.
 Proof.
-split => [x y|]; first by rewrite map_tfpsM.
+split => [|x y]; last by rewrite map_tfpsM.
 by apply/tfps_inj => /=; rewrite rmorph1.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build
-    {tfps K n} {tfps L n} map_tfps map_tfps_is_multiplicative.
+  GRing.isMonoidMorphism.Build
+    {tfps K n} {tfps L n} map_tfps map_tfps_is_monoid_morphism.
 
 
 (* Tests *)
@@ -1275,22 +1324,23 @@ Qed.
 
 End MapTFPS.
 
-Lemma map_tfps_injective (K L : ringType) n (F : {rmorphism K -> L}) :
+Lemma map_tfps_injective (K L : nzSemiRingType) n (F : {rmorphism K -> L}) :
   injective F -> injective (@map_tfps _ _ n F).
 Proof.
 by move=> Finj x y /val_eqP/eqP/(map_poly_injective Finj)/tfps_inj.
 Qed.
 
-Lemma map_tfps_inj (K : fieldType) (L : ringType) n (F : {rmorphism K -> L}) :
+Lemma map_tfps_inj (K : fieldType) (L : nzRingType) n (F : {rmorphism K -> L}) :
   injective (@map_tfps _ _ n F).
 Proof. by move=> x y /val_eqP/eqP /= /map_poly_inj H; apply tfps_inj. Qed.
 
-Lemma trXnt_map_poly (m n : nat) (K L : ringType)
+Lemma trXnt_map_poly (m n : nat) (K L : nzSemiRingType)
       (F : {rmorphism K -> L}) (g : {tfps K n}) :
   trXnt m (map_tfps F g) = map_tfps F (trXnt m g).
 Proof. by apply/tfpsP=> i le_in; rewrite !(coef_map, coef_trXn) le_in. Qed.
 
-Lemma map_poly_idfun (R : ringType) : map_poly (@idfun R) =1 @idfun {poly R}.
+Lemma map_poly_idfun (R : nzSemiRingType) :
+  map_poly (@idfun R) =1 @idfun {poly R}.
 Proof. exact: coefK. Qed.
 
 Lemma map_tfps_idfun (K : fieldType) (m : nat) :
@@ -1301,9 +1351,9 @@ by rewrite coef_tfpsE /= map_poly_idfun.
 Qed.
 
 
-Section Coefficient01.
+Section Coefficient01SemiRing.
 
-Variables (R : ringType) (n : nat).
+Variables (R : nzSemiRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
 Definition coeft0_eq0 := fun f : {tfps R n} => f`_0 == 0.
@@ -1314,6 +1364,51 @@ Proof. by rewrite -topredE. Qed.
 
 Lemma coeft0_eq1E f : (f \in coeft0_eq1) = (f`_0 == 1).
 Proof. by rewrite -topredE. Qed.
+
+Lemma zero_in_coeft0_eq0 : 0 \in coeft0_eq0.
+Proof. by rewrite coeft0_eq0E coeft0. Qed.
+
+Lemma tfpsX_in_coeft0_eq0 : \X \in coeft0_eq0.
+Proof. by rewrite coeft0_eq0E coef_tfpsX /= mulr0. Qed.
+
+Lemma coeft0_eq0Z f c : f \in coeft0_eq0 -> c *: f \in coeft0_eq0.
+Proof. by rewrite !coeft0_eq0E coeftZ => /eqP ->; rewrite mulr0. Qed.
+
+Lemma tfpscX_in_coeft0_eq0 c : c *: \X \in coeft0_eq0.
+Proof. exact/coeft0_eq0Z/tfpsX_in_coeft0_eq0. Qed.
+
+Lemma coeft0_eq0D f g :
+  f \in coeft0_eq0 -> g \in coeft0_eq0 -> f + g \in coeft0_eq0.
+Proof. by rewrite !coeft0_eq0E coeftD => /eqP -> /eqP ->; rewrite addr0. Qed.
+
+Lemma coeft0_eq0Mr f g : f \in coeft0_eq0 -> f * g \in coeft0_eq0.
+Proof. by rewrite !coeft0_eq0E coeft0M => /eqP->; rewrite mul0r. Qed.
+Lemma coeft0_eq0Ml f g : g \in coeft0_eq0 -> f * g \in coeft0_eq0.
+Proof. by rewrite !coeft0_eq0E coeft0M => /eqP->; rewrite mulr0. Qed.
+
+Lemma coeft0_eq0X f i : f \in coeft0_eq0 -> f ^+ i.+1 \in coeft0_eq0.
+Proof.
+elim: i => [| i IHi]; first by rewrite expr1.
+by rewrite exprS => /coeft0_eq0Mr; apply.
+Qed.
+
+Lemma coeft0_eq1_add01 f g :
+  f \in coeft0_eq0 -> g \in coeft0_eq1 -> f + g \in coeft0_eq1.
+Proof.
+rewrite coeft0_eq0E !coeft0_eq1E coefD => /eqP -> /eqP ->.
+by rewrite add0r.
+Qed.
+
+End Coefficient01SemiRing.
+
+
+Section Coefficient01Ring.
+
+Variables (R : nzRingType) (n : nat).
+Implicit Types (f g : {tfps R n}).
+
+Local Notation coeft0_eq0 := (@coeft0_eq0 R n).
+Local Notation coeft0_eq1 := (@coeft0_eq1 R n).
 
 Fact coeft0_eq0_idealr : idealr_closed coeft0_eq0.
 Proof.
@@ -1326,37 +1421,11 @@ Canonical coeft0_eq0_keyed := Eval hnf in KeyedPred coeft0_eq0_key.
 HB.instance Definition _ :=
   isIdealr.Build {tfps R n} coeft0_eq0 coeft0_eq0_idealr.
 
-Lemma coeft0_eq0Z f c : f \in coeft0_eq0 -> c *: f \in coeft0_eq0.
-Proof. by move=> hf; rewrite -mulr_algl idealMr. Qed.
-
-Lemma coeft0_eq0X f i : f \in coeft0_eq0 -> f ^+ i.+1 \in coeft0_eq0.
-Proof. by move=> hf; rewrite exprSr idealMr. Qed.
-
 Lemma coeft0_eq10 f : (f \in coeft0_eq1) = ((1 - f) \in coeft0_eq0).
 Proof. by rewrite ?coeft0_eq0E ?coeft0_eq1E coefB coef1 subr_eq0 eq_sym. Qed.
 
 Lemma coeft0_eq01 f : (f \in coeft0_eq0) = ((1 + f) \in coeft0_eq1).
 Proof. by rewrite coeft0_eq10 -[RHS]rpredN !opprD !opprK addKr. Qed.
-
-Lemma coeft0_eq1_add01 f g :
-  f \in coeft0_eq0 -> g \in coeft0_eq1 -> f + g \in coeft0_eq1.
-Proof.
-rewrite coeft0_eq0E !coeft0_eq1E coefD => /eqP -> /eqP ->.
-by rewrite add0r.
-Qed.
-
-Lemma tfpsX_in_coeft0_eq0 : \X \in coeft0_eq0.
-Proof. by rewrite coeft0_eq0E coef_trXn coefX. Qed.
-Lemma tfpscX_in_coeft0_eq0 c : c *: \X \in coeft0_eq0.
-Proof. exact/coeft0_eq0Z/tfpsX_in_coeft0_eq0. Qed.
-
-(* tests *)
-Example zero_in_coeft0_eq0 : 0 \in coeft0_eq0.
-Proof. by rewrite rpred0. Qed.
-
-Example coeft0_eq0D f g :
-    f \in coeft0_eq0 -> g \in coeft0_eq0 -> f + g \in coeft0_eq0.
-Proof. by move=> hf hg; rewrite rpredD. Qed.
 
 Example coeft0_eq0N f : f \in coeft0_eq0 -> (-f) \in coeft0_eq0.
 Proof. by move=> hf; rewrite rpredN. Qed.
@@ -1379,15 +1448,15 @@ Example coeft0_eq1M f g :
   f \in coeft0_eq1 -> g \in coeft0_eq1 -> f * g \in coeft0_eq1.
 Proof. by move=> hf hg; rewrite rpredM. Qed.
 
-End Coefficient01.
+End Coefficient01Ring.
 Arguments coeft0_eq0 {R n}.
 Arguments coeft0_eq1 {R n}.
 
-Lemma coeft0_eq0_trXnt (R : ringType) (n m : nat) (f : {tfps R n}) :
+Lemma coeft0_eq0_trXnt (R : nzSemiRingType) (n m : nat) (f : {tfps R n}) :
   (trXnt m f \in coeft0_eq0) = (f \in coeft0_eq0).
 Proof. by rewrite !coeft0_eq0E coef0_trXn. Qed.
 
-Lemma coeft0_eq1_trXnt (R : ringType) (n m : nat) (f : {tfps R n}) :
+Lemma coeft0_eq1_trXnt (R : nzSemiRingType) (n m : nat) (f : {tfps R n}) :
   (trXnt m f \in coeft0_eq1) = (f \in coeft0_eq1).
 Proof. by rewrite !coeft0_eq1E coef0_trXn. Qed.
 
@@ -1439,7 +1508,7 @@ End Coefficient01IDomain.
 
 Section MoreExpPoly.
 
-Variable (R : ringType).
+Variable (R : nzSemiRingType).
 Implicit Type (p q : {poly R}).
 
 Lemma coefX_eq0 n m p : p`_0 = 0 -> n < m -> (p ^+ m)`_n = 0.
@@ -1450,7 +1519,7 @@ case: n => [_|n].
   elim: m.+1 {IHm} => {m}[|m IHm]; first by rewrite !expr0 coef1 eq_refl.
   by rewrite !exprS -{}IHm coefM big_ord_recl big_ord0 addr0.
 rewrite ltnS exprS => lt_nm.
-rewrite coefM; apply big1 => [] [j]; rewrite /= ltnS => le_ji _.
+rewrite coefM; apply: big1 => [] [j]; rewrite /= ltnS => le_ji _.
 case: j le_ji => [|j]; first by rewrite Hp mul0r.
 rewrite !ltnS subSS => le_jn.
 by rewrite IHm ?mulr0 // (leq_ltn_trans (leq_subr _ _ ) lt_nm).
@@ -1478,6 +1547,13 @@ rewrite (bigID (fun k => val k >= i)) /= ?big1 ?addr0 // => [] [k Hk] /= H.
   exact: (leq_ltn_trans le_li (leq_trans lt_n_addij (leq_add _ _))).
 Qed.
 
+End MoreExpPoly.
+
+Section MoreExpPolyRing.
+
+Variable (R : nzSemiRingType).
+Implicit Type (p q : {poly R}).
+
 Lemma coefX_tfps_eq0 n m i :
   i < m -> {in coeft0_eq0, forall f : {tfps R n}, (f ^+ m)`_i = 0}.
 Proof.
@@ -1502,17 +1578,12 @@ rewrite mul_tfps_val !exp_tfps_val trXn_mul.
 by rewrite trXnMX_eq0 //= -/(_`_0) ?(eqP f0) ?(eqP g0).
 Qed.
 
-End MoreExpPoly.
+End MoreExpPolyRing.
 
 
 (* We state the lemmas with a general f and then with \X       *)
 (* because substitution is not a non-commutative ring morphism *)
-Section GeometricSeries.
-
-Variables (R : ringType) (n : nat).
-Implicit Types (f g : {tfps R n}).
-
-Lemma coeft_geometric m :
+Lemma coeft_geometric (R : nzSemiRingType) (n m : nat) :
   m <= n -> (\sum_(i < n.+1) \X ^+ i : {tfps R n})`_m = 1.
 Proof.
 move=> le_mn; pose c1 := fun i : nat => 1 : R.
@@ -1520,6 +1591,12 @@ rewrite (eq_bigr (fun i : 'I_n.+1 => (c1 i) *: \X ^+ i)); first last.
   by move=> i _; rewrite scale1r.
 by rewrite !coef_tfps_sumfXi.
 Qed.
+
+
+Section GeometricSeriesRing.
+
+Variables (R : nzRingType) (n : nat).
+Implicit Types (f g : {tfps R n}).
 
 Lemma geometrictMlf f :
   f \in coeft0_eq0 -> (1 - f) * (\sum_(i < n.+1) f ^+ i) = 1.
@@ -1543,9 +1620,8 @@ Qed.
 Lemma geometrictMl : (\sum_(i < n.+1) \X ^+ i) * (1 - \X) = 1 :> {tfps R n}.
 Proof. exact: geometrictMrf (tfpsX_in_coeft0_eq0 _ _). Qed.
 
-End GeometricSeries.
+End GeometricSeriesRing.
 
-(* Is the following better done using composition of series ? *)
 
 Section GeometricSeriesUnit.
 
@@ -1583,9 +1659,9 @@ Proof. by rewrite -{1}[c]opprK scaleNr; apply: coef_geometrict_1cNV. Qed.
 End GeometricSeriesUnit.
 
 
-Section DivisionByX.
+Section DivisionByXSemiRing.
 
-Variable R : ringType.
+Variable R : nzSemiRingType.
 
 Definition tmulX m (f : {tfps R m}) :=
   [tfps i <= m.+1 => if i == 0%N then 0 else f`_i.-1].
@@ -1625,11 +1701,6 @@ Proof.
 move=> p; apply/tfpsP => i Hi.
 by rewrite coeft_tdivX coeft_tmulX.
 Qed.
-Lemma tdivXK m : {in coeft0_eq0, cancel (@tdivX m.+1) (@tmulX m)}.
-Proof.
-move=> p Hp.
-by apply/tfpsP => [[|i]] Hi; rewrite coeft_tmulX coeft_tdivX // (eqP Hp).
-Qed.
 
 Lemma tmulX1 m : tmulX 1 = \X :> {tfps R m.+1}.
 Proof.
@@ -1639,23 +1710,23 @@ Qed.
 Lemma tdivXX m : tdivX (\X : {tfps R m.+1}) = 1 :> {tfps R m}.
 Proof. by rewrite -[RHS]tmulXK tmulX1. Qed.
 
-Fact tmulX_is_linear m : linear (@tmulX m).
+Fact tmulX_is_semilinear m : semilinear (@tmulX m).
 Proof.
-move=> c f g; apply/tfpsP => i _; rewrite !(coeftD, coeftZ, coeft_tmulX).
-by case: eqP => //; rewrite mulr0 add0r.
+by split => [c f | f g]; apply/tfpsP => i _;
+    rewrite !(coeftD, coeftZ, coeft_tmulX); case: eqP; rewrite ?mulr0 ?add0r.
 Qed.
 HB.instance Definition _ m :=
-  GRing.isLinear.Build
-    R {tfps R m} {tfps R m.+1} _ (@tmulX m) (@tmulX_is_linear m).
+  GRing.isSemilinear.Build
+    R {tfps R m} {tfps R m.+1} _ (@tmulX m) (@tmulX_is_semilinear m).
 
-Fact tdivX_is_linear m : linear (@tdivX m).
+Fact tdivX_is_semilinear m : semilinear (@tdivX m).
 Proof.
-by move=> c f g; apply/tfpsP => i _; rewrite !(coeftD, coeftZ, coeft_tdivX).
+by split => [c f | f g]; apply/tfpsP => i _;
+    rewrite !(coeftD, coeftZ, coeft_tdivX).
 Qed.
 HB.instance Definition _ m :=
-  GRing.isLinear.Build
-    R {tfps R m} {tfps R m.-1} _ (@tdivX m) (@tdivX_is_linear m).
-
+  GRing.isSemilinear.Build
+    R {tfps R m} {tfps R m.-1} _ (@tdivX m) (@tdivX_is_semilinear m).
 
 Variable m : nat.
 Implicit Type f : {tfps R m}.
@@ -1709,7 +1780,15 @@ case: i lt_ji {lt_im1} => // i.
 by rewrite !ltnS subSS leq_subr.
 Qed.
 
-End DivisionByX.
+End DivisionByXSemiRing.
+
+
+Lemma tdivXK (R : nzRingType) m :
+  {in coeft0_eq0, cancel (@tdivX R m.+1) (@tmulX R m)}.
+Proof.
+move=> p Hp.
+by apply/tfpsP => [[|i]] Hi; rewrite coeft_tmulX coeft_tdivX // (eqP Hp).
+Qed.
 
 Lemma tdivXE (K : idomainType) m :
   {in @coeft0_eq0 K m, forall f, tdivX f = trXn m.-1 (tfps f %/ 'X)}.
@@ -1723,7 +1802,8 @@ Qed.
 
 Section MapMulfXDivfX.
 
-Variables (K L : ringType) (F : {rmorphism K -> L}) (m : nat) (g : {tfps K m}).
+Variables (K L : nzSemiRingType) (F : {rmorphism K -> L})
+  (m : nat) (g : {tfps K m}).
 
 Lemma map_tfps_tmulX : map_tfps F (tmulX g) = tmulX (map_tfps F g).
 Proof.
@@ -1743,7 +1823,7 @@ End MapMulfXDivfX.
 
 Section Derivative.
 
-Variables (R : ringType) (n : nat).
+Variables (R : nzSemiRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
 Lemma deriv_trXn (p : {poly R}) :
@@ -1800,12 +1880,11 @@ apply/tfpsP => i le_in1.
 by rewrite !(coef_poly, coefZ) ltnS le_in1 mulrnAr.
 Qed.
 
-Fact deriv_tfps_is_linear : linear deriv_tfps.
-Proof. by move => c f g; rewrite derivD_tfps derivZ_tfps. Qed.
+Fact deriv_tfps_is_semilinear : semilinear deriv_tfps.
+Proof. by split => [c f | f g]; rewrite ?derivZ_tfps ?derivD_tfps. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build
-    R {tfps R n} {tfps R n.-1} _ deriv_tfps deriv_tfps_is_linear.
-
+  GRing.isSemilinear.Build
+    R {tfps R n} {tfps R n.-1} _ deriv_tfps deriv_tfps_is_semilinear.
 
 (* Tests *)
 Example test_deriv_tfps0 : 0^`() = 0.
@@ -1816,12 +1895,17 @@ Proof. by rewrite linearD. Qed.
 
 End Derivative.
 
+(* Check derivative on Ring *)
+Example test_deriv_tfpsB (R : nzRingType) (n : nat) (f g : {tfps R n}) :
+  (f - g)^`() = f^`()%tfps - g^`()%tfps.
+Proof. by rewrite linearB. Qed.
+
 Notation "f ^` () " := (deriv_tfps f) : tfps_scope.
 
 
 Section MoreDerivative.
 
-Variables (R : ringType).
+Variables (R : nzSemiRingType).
 
 Lemma deriv_tfpsX n : \Xo(n.+1)^`() = 1  :> {tfps R n}.
 Proof. by rewrite deriv_tfpsE val_tfpsX scale1r derivX trXn1. Qed.
@@ -1866,9 +1950,8 @@ End MoreDerivative.
 
 Section DerivativeComRing.
 
-Variables (R : comRingType) (n : nat).
+Variables (R : comNzSemiRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
-
 
 Theorem derivX_tfps f k :
   (f ^+ k)^`() = (trXnt n.-1 f) ^+ k.-1 * f^`()%tfps *+ k.
@@ -2067,7 +2150,7 @@ Notation "\int f" := (prim_tfps f) : tfps_scope.
 
 Section MoreCompPoly.
 
-Variable (R : ringType).
+Variable (R : nzSemiRingType).
 Implicit Type (p q : {poly R}).
 
 Lemma trXn_comp_polyr n p q :
@@ -2086,7 +2169,7 @@ Proof.
 move => q0_eq0; apply/trXnP => i le_in.
 rewrite -{1}(poly_cat p n.+1) comp_polyD coefD !trXnE.
 rewrite [X in _ + X](_ : _ = 0) ?addr0 //.
-rewrite coef_comp_poly; apply big1 => [] [j /=] le_jsz _.
+rewrite coef_comp_poly; apply: big1 => [] [j /=] le_jsz _.
 rewrite coefXnM; case: ltnP => [] Hi; first by rewrite mul0r.
 by rewrite coefX_eq0 ?mulr0 // (leq_ltn_trans le_in Hi).
 Qed.
@@ -2096,7 +2179,7 @@ End MoreCompPoly.
 
 Section Composition.
 
-Variables (R : ringType) (n : nat).
+Variables (R : nzSemiRingType) (n : nat).
 
 Definition comp_tfps m (f g : {tfps R m}) :=
   if f \in coeft0_eq0
@@ -2114,17 +2197,17 @@ Lemma comp_tfps_coeft0_eq0 m (f g : {tfps R m}) :
   g \in coeft0_eq0 -> f \oT g = trXn m (tfps f \Po tfps g).
 Proof. by move => f0_eq0 ; rewrite /comp_tfps f0_eq0. Qed.
 
-Lemma comp_tfps0r m (f : {tfps R m}) : f \oT 0 = (f`_0)%:S.
-Proof.
-rewrite comp_tfps_coeft0_eq0 ?rpred0 // comp_poly0r.
-by rewrite -tfpsCE -coef_tfpsE.
-Qed.
-
 Lemma comp_tfps0l m (f : {tfps R m}) : 0 \oT f = 0.
 Proof.
 case (boolP (f \in coeft0_eq0)) => [f0_eq0 | f0_neq0].
 - by rewrite comp_tfps_coeft0_eq0 // comp_poly0 rmorph0.
 - by rewrite comp_tfps_coef0_neq0 // coeft0 tfpsC0.
+Qed.
+
+Lemma comp_tfps0r m (f : {tfps R m}) : f \oT 0 = (f`_0)%:S.
+Proof.
+rewrite comp_tfps_coeft0_eq0 ?rpred0 ?zero_in_coeft0_eq0 // comp_poly0r.
+by rewrite -tfpsCE -coef_tfpsE.
 Qed.
 
 Implicit Types (f g h : {tfps R n}) (p q : {poly R}).
@@ -2210,16 +2293,18 @@ have [->| c_neq0] := eqVneq c 0.
 by rewrite comp_tfps_coef0_neq0 // coeft0_eq0E coeftC.
 Qed.
 
-Fact comp_tfps_is_linear (f : {tfps R n}) : linear (comp_tfps f).
+Fact comp_tfps_is_semilinear (f : {tfps R n}) : semilinear (comp_tfps f).
 Proof.
-case: (boolP (f \in coeft0_eq0)) => Hf a q r.
-- by rewrite !comp_tfps_coeft0_eq0 // !raddfD /= !linearZ.
-- rewrite !comp_tfps_coef0_neq0 // coeftD coeftZ.
-  by rewrite raddfD /= -!/(_`_0) tfpsCM -alg_tfpsC mulr_algl.
+split=> [/= r g | /= g h]; case: (boolP (f \in coeft0_eq0)) => Hf.
+- by rewrite !comp_tfps_coeft0_eq0 //= !linearZ.
+- rewrite !comp_tfps_coef0_neq0 // coeftZ.
+  by rewrite tfpsCM -alg_tfpsC mulr_algl.
+- by rewrite !comp_tfps_coeft0_eq0 //= !linearD.
+- by rewrite !comp_tfps_coef0_neq0 // coeftD raddfD.
 Qed.
 HB.instance Definition _ (f : {tfps R n}) :=
-  GRing.isLinear.Build
-    R {tfps R n} {tfps R n} _ (comp_tfps f) (comp_tfps_is_linear f).
+  GRing.isSemilinear.Build
+    R {tfps R n} {tfps R n} _ (comp_tfps f) (comp_tfps_is_semilinear f).
 
 
 Lemma comp_tfpsXr f : f \oT \X = f.
@@ -2270,14 +2355,14 @@ Proof. by rewrite !unit_tfpsE coef0_comp_tfps. Qed.
 End CompUnitRing.
 
 
-Section CompComRing.
+Section CompComSemiRing.
 
-Variables (R : comRingType) (n : nat).
+Variables (R : comNzSemiRingType) (n : nat).
 Implicit Types (f g h : {tfps R n}) (p : {poly R}).
 
-Fact comp_tfps_is_multiplicative f : multiplicative (comp_tfps f).
+Fact comp_tfps_is_monoid_morphism f : monoid_morphism (comp_tfps f).
 Proof.
-split => /= [g1 g2|]; last exact: comp_tfps1.
+split => /= [|g1 g2]; first exact: comp_tfps1.
 case: (boolP (f \in coeft0_eq0)) => Hf.
 - rewrite !comp_tfps_coeft0_eq0 // mul_tfps_val /=.
   rewrite -trXn_comp_polyl -?coef_tfpsE ?(eqP Hf) //.
@@ -2286,8 +2371,8 @@ case: (boolP (f \in coeft0_eq0)) => Hf.
 - by rewrite !comp_tfps_coef0_neq0 // coeft0M -rmorphM.
 Qed.
 HB.instance Definition _ f :=
-  GRing.isMultiplicative.Build
-    {tfps R n} {tfps R n} (comp_tfps f) (comp_tfps_is_multiplicative f).
+  GRing.isMonoidMorphism.Build
+    {tfps R n} {tfps R n} (comp_tfps f) (comp_tfps_is_monoid_morphism f).
 
 Lemma comp_tfpsA f g h : f \oT (g \oT h) = (f \oT g) \oT h.
 Proof.
@@ -2298,7 +2383,7 @@ case (boolP (g \in coeft0_eq0)) => [g0_eq0 | g0_neq0]; first last.
   by rewrite !(comp_tfps_coef0_neq0 f) ?comp_tfpsC // coeft0_eq0_comp.
 rewrite comp_tfps_coeft0_eq0 ?coeft0_eq0_comp //.
 rewrite !comp_tfps_coeft0_eq0 //.
-rewrite -trXn_comp_polyr comp_polyA trXn_comp_polyl //.
+rewrite -trXn_comp_polyr comp_polyA -trXn_comp_polyl //.
 by move: h0_eq0; rewrite coeft0_eq0E => /eqP.
 Qed.
 
@@ -2344,10 +2429,10 @@ rewrite -[RHS]tfpsK [m.+1.-1]/=.
 rewrite /= !comp_tfps_coeft0_eq0 ?coeft0_eq0_trXnt //.
 rewrite deriv_trXn !trXn_trXn // deriv_comp.
 rewrite -[LHS]trXn_mul /=; congr (trXn _ (_ * _)).
-by rewrite -trXn_comp_polyr trXn_comp_polyl ?(eqP f0_eq0).
+by rewrite -trXn_comp_polyr -trXn_comp_polyl ?(eqP f0_eq0).
 Qed.
 
-End CompComRing.
+End CompComSemiRing.
 
 
 Section Lagrange.
@@ -2675,7 +2760,7 @@ case: (ltnP i k) => [lt_ik | le_ki].
   (* If i < k both side vanishes *)
   rewrite coefX_tfps_eq0 ?ltnS //.
   rewrite [X in X / _](_ : _ = 0) ?mul0r //.
-  rewrite coeftM le_in1; apply big1 => [[j /=]]; rewrite ltnS => le_ji _.
+  rewrite coeftM le_in1; apply: big1 => [[j /=]]; rewrite ltnS => le_ji _.
   rewrite coef_deriv_tfps.
   rewrite coef_tfpsXn eqSS (ltn_eqF (leq_ltn_trans le_ji lt_ik)).
   by rewrite andbF mul0rn mul0r.
@@ -2910,7 +2995,7 @@ move=> p.
 rewrite /prim -{3}[p]coefK ; apply/polyP => i.
 rewrite coef_deriv !coef_poly ltnS.
 case: (_ < _); last by rewrite mul0rn.
-by rewrite eqn0Ngt ltn0Sn -mulr_natr /= divrK.
+by rewrite /= mulr1n /= -[LHS]mulr_natr /= divrK.
 Qed.
 
 Implicit Types (f g : {tfps R n}).
@@ -3348,10 +3433,10 @@ Module TFPSField.
 Section TFPSField.
 
 Variables K : fieldType.
-Hypothesis char_K_is_zero : [char K] =i pred0.
+Hypothesis char_K_is_zero : [pchar K] =i pred0.
 
 Lemma nat_unit_field i : i.+1%:R \is a @GRing.unit K.
-Proof. by rewrite unitfE; move: char_K_is_zero => /charf0P ->. Qed.
+Proof. by rewrite unitfE; move: char_K_is_zero => /pcharf0P ->. Qed.
 
 Local Notation nuf := nat_unit_field.
 
@@ -3417,13 +3502,13 @@ Section FromRMorphism.
 Variables R : unitRingType.
 
 Fact ratr_rmorphism_nat_unit :
-  (additive (@ratr R) /\ multiplicative (@ratr R))
+  (zmod_morphism (@ratr R) /\ monoid_morphism (@ratr R))
   <->
     (forall i, i.+1%:R \is a @GRing.unit R).
 Proof.
 split=> [[ratr_add ratr_mult] i | nat_unit].
-- have ratrAM := GRing.isAdditive.Build _ _ _ ratr_add.
-  have ratrMM := GRing.isMultiplicative.Build _ _ _ ratr_mult.
+- have ratrAM := GRing.isZmodMorphism.Build _ _ _ ratr_add.
+  have ratrMM := GRing.isMonoidMorphism.Build _ _ _ ratr_mult.
   pose ratr_morph : {rmorphism rat -> R} := HB.pack (@ratr R) ratrAM ratrMM.
   rewrite -ratr_nat; apply: (rmorph_unit ratr_morph).
   by rewrite unitfE Num.Theory.pnatr_eq0.
@@ -3460,7 +3545,8 @@ Fact rat_algtype_nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
 Proof.
 rewrite -ratr_rmorphism_nat_unit.
 have eq_in_ratr := fmorph_eq_rat (in_alg R).
-by repeat split => [x y|]; rewrite -!eq_in_ratr ?rmorphB ?rmorphM ?rmorph1.
+split => [x y|]; first by rewrite -!eq_in_ratr ?rmorphB.
+by split => [|x y]; rewrite -!eq_in_ratr ?rmorphM ?rmorph1.
 Qed.
 
 End FromRatAlgType.

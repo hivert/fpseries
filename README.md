@@ -1,6 +1,6 @@
 # FormalPowerSeries
 
-[![Nix CI for bundle coq8.17-mc2.2.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.17-mc2.2.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.17-mc2.2.0.yml) [![Nix CI for bundle coq8.18-mc2.2.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.2.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.2.0.yml) [![Nix CI for bundle coq8.17-mc2.2.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.2.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.2.0.yml)
+[![Nix CI for bundle coq8.18-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.3.0.yml) [![Nix CI for bundle coq8.19-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.3.0.yml) [![Nix CI for bundle coq8.20-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.20-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.20-mc2.3.0.yml)
 
 ## Formal power series in Mathematical Components.
 
@@ -19,7 +19,7 @@ properties.
 
 2 - Formal Power Series using classical axioms. These are defined as the
 inverse limit of the truncated power series allowing to transfer easily result
-between the two setting.
+between the two settings.
 
 The main results are
 - formula for the multiplicative inverse of a series both in a commutative and
@@ -31,14 +31,14 @@ The main results are
 - Lagrange inversion formulas (Lagrange-Bürmann theorem);
 - exponential and logarithm series.
 
-All those results are proved both for truncated and non-trucated series.
+All those results are proved both for truncated and non-truncated series.
 
 
 ## Application to combinatorics
 
 To test the framework I provide 6 proofs of the formula for Catalan
 numbers. I'm using the following 3 different strategies together with
-truncated and non-trucated series:
+truncated and non-truncated series:
 
 1 - prove the algebraic equation `F = 1 + X F^2` and extract the
 coefficients using square root and Newton's formula;
@@ -50,14 +50,30 @@ using Lagrange inversion formula;
  `(1 - 2X) F + (1 - 4X) X F' = 1` which give the recursion
  `(n+2) C(n+1) = (4n + 2) C(n)` and solve it.
 
+## Authors
 
-All these files are still largely experimental
+- Florent Hivert
+
+The code for truncated power series (files auxresults.v and tfps.v) is
+partly copied from
+
+  https://github.com/Barbichu/newtonsums
+
+by
+
+- Cyril Cohen
+- Boris Djalal
+
+## Dependencies
+
+All these files are still largely experimental.
 
 To compile it I'm using the following opam packages:
 ```
-coq-hierarchy-builder     1.7.0
-coq-mathcomp-ssreflect    2.2.0
-coq-mathcomp-algebra      2.2.0
-coq-mathcomp-classical    1.0.0
+rocq-hierarchy-builder     1.9.1
+rocq-mathcomp-ssreflect    2.5.0
+rocq-mathcomp-algebra      2.5.0
+rocq-mathcomp-multinomials 2.5.0
+rocq-mathcomp-classical    1.14.0
 ```
 

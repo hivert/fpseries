@@ -56,10 +56,10 @@ Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
 
 Import GRing.Theory.
 
-Local Definition char_rat := Num.Theory.char_num rat.
-Local Definition nat_unit := tfps.TFPSField.nat_unit_field char_rat.
-Local Definition fact_unit := tfps.TFPSField.fact_unit char_rat.
-Hint Resolve char_rat nat_unit : core.
+Local Definition pchar_rat := Num.Theory.pchar_num rat.
+Local Definition nat_unit := tfps.TFPSField.nat_unit_field pchar_rat.
+Local Definition fact_unit := tfps.TFPSField.fact_unit pchar_rat.
+Hint Resolve pchar_rat nat_unit : core.
 
 Section GenSeries.
 
@@ -177,10 +177,9 @@ Proposition FC_fixpoint_eq : FC - 1 = lagrfix ((1 + ''X) ^+ 2).
 Proof.
 apply: (lagrfix_uniq one_plusX_2_unit).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
-rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //; first last.
-  rewrite coefs0_eq0E coefsB coefs1.
-  by rewrite coefs_FPSeries /= C0 subrr.
-by rewrite addrC subrK.
+rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //; first by ring.
+rewrite coefs0_eq0E coefsB coefs1.
+by rewrite coefs_FPSeries /= C0 subrr.
 Qed.
 
 Theorem CatM_Lagrange i : (i.+1 * (C i))%N = 'C(i.*2, i).
@@ -234,8 +233,7 @@ have -> : ''X * FC^`()%fps = (FC - 1)/(1 - ''X *+ 2 * FC).
   rewrite derivD_fps deriv_fps1 add0r.
   rewrite derivM_fps /= deriv_fpsX mul1r derivX_fps /= expr1.
   rewrite mulrDr FalgN => /eqP; rewrite -(subr_eq _ _ (''X * _)) => /eqP <-.
-  by apply/eqP => /=; move: ''X => X; ring.
-  (* TODO : why is this [move: ''X => X] needed ? *)
+  by apply/eqP => /=; ring.
 rewrite mulrA -[X in X + _](mulrK X2Fu) -mulrDl -[RHS]divr1.
 apply/eqP; rewrite eq_divr ?unitr1 //; apply/eqP.
 by rewrite !mulr2n; ring: FalgN.
@@ -253,9 +251,8 @@ rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coefs_FPSeries.
 case: n => [|n] /=; first by rewrite !Csimpl.
 move: {n} n.+1 => n; move: (C n.+1) (C n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
-move/eqP; rewrite subr_eq add0r subr_eq -natrD Num.Theory.eqr_nat => /eqP.
-rewrite mulnC -mulnDr => ->.
-by rewrite mulnC [n * 4]mulnC.
+move/eqP; rewrite subr_eq add0r subr_eq -natrD Num.Theory.eqr_nat.
+by nia.
 Qed.
 
 Theorem CatM_from_rec n : n.+1 * C n = 'C(n.*2, n).

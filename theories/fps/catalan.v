@@ -56,10 +56,10 @@ Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
 
 Import GRing.Theory.
 
-Local Definition char_rat := Num.Theory.char_num rat.
-Local Definition nat_unit := nat_unit_field char_rat.
-Local Definition fact_unit := fact_unit char_rat.
-Hint Resolve char_rat nat_unit : core.
+Local Definition pchar_rat := Num.Theory.pchar_num rat.
+Local Definition nat_unit := nat_unit_field pchar_rat.
+Local Definition fact_unit := fact_unit pchar_rat.
+Hint Resolve pchar_rat nat_unit : core.
 
 Section GenSeries.
 
@@ -103,7 +103,7 @@ have co1 : 1 - 4%:R *: \X \in @coeft0_eq1 rat n.
   by rewrite mulr_nat coeft0_eq1E !coeft_simpl subr0.
 have: (2%:R *: \X * FC n - 1) ^+ 2 = 1 - 4%:R *: \X.
   by rewrite !mulr_nat sqrrB1 {2}FC_algebraic_eq; ring.
-move/(sqrtE char_rat) => /(_ co1) [HeqP | HeqN].
+move/(sqrtE pchar_rat) => /(_ co1) [HeqP | HeqN].
   exfalso; move: HeqP => /(congr1 (fun x : {tfps _ _ } => x`_0)).
   rewrite mulr_nat; repeat rewrite ?coeft_simpl -?mulrA ?eqxx /=.
   rewrite (eqP (coeft0_eq1_expr _ _)) => /eqP.
@@ -241,11 +241,11 @@ have -> : tmulX F^`() = (F - 1)/(1 - \X *+ 2 * F).
   rewrite derivD_tfps deriv_tfps1 add0r.
   rewrite derivM_tfps /= deriv_tfpsX mul1r derivX_tfps /= expr1.
   rewrite raddfD /= -trXnt_tmulX // (tmulXE (F ^+ 2)).
-  rewrite trXntM // trXnt_trXnt // trXnt_id trXnt_tfpsX.
-  rewrite FalgN [X in _ + tmulX X]mulrC -tmulXM.
-  rewrite raddfMn /= [X in (tmulX X) *+ 2]mulrC -tmulXM.
-  rewrite -(subr_eq _ _ (_ _ * \X)) => /eqP <-.
-  by apply/eqP; move: (tmulX _) => F'; ring.
+  rewrite trXntM // trXnt_trXnt // trXnt_id  [trXnt n.+1 _]trXnt_tfpsX.
+  rewrite {}FalgN -subr_eq => /eqP <-; apply/eqP.
+  rewrite [in RHS]mulrnAr -mulrnAl mulrA [_ * F^`()%tfps]mulrC.
+  rewrite -[_ \X *+ 2]raddfMn -trXntM //= -[in RHS]tmulXM.
+  by ring.
 rewrite mulrA -[X in X + _](mulrK X2Fu) -mulrDl -[RHS]divr1.
 apply/eqP; rewrite eq_divr ?unitr1 //; apply/eqP.
 by rewrite !mulr2n; ring: FalgN.
