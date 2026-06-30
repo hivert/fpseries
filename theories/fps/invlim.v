@@ -104,9 +104,8 @@ comUnitAlgInvLimType Sys == inverse limits of commutative algebras with
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
+From mathcomp Require Import all_boot order ssralg.
 From mathcomp Require Import boolp classical_sets.
-From mathcomp Require Import order finmap bigop.
 
 Require Import natbar directed.
 

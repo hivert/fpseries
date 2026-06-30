@@ -1,7 +1,6 @@
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import all_boot order ssralg fraction.
 From mathcomp Require Import boolp classical_sets.
-From mathcomp Require Import order.
 
 Require Import auxresults natbar directed tfps invlim fps.
 
@@ -26,22 +25,19 @@ Notation "{ 'flps' R }" := (laurent_series R).
 Section Laurent.
 
 Variable (R : fieldType).
-Implicit Type (x y : {flps R}) (f g : {fps R}).
+Implicit Type (s t : {flps R}) (f g : {fps R}).
 
 
-Lemma flps_uniqueP x :
+Lemma flps_uniqueP s :
   exists! (n : nat) (f : {fps R}),
-    ((n == 0%N) || (f \is a GRing.unit)) /\ x = pi {flps R} (Ratio f (''X ^+ n)).
+    ((n == 0%N) || (f \is a GRing.unit)) /\ s = pi {flps R} (Ratio f (''X ^+ n)).
 Proof.
-elim/quotW: x => [[[num den]/= den_eq0]].
+elim/quotW: s => [[[num den]/= den_eq0]].
 have/fpsf_XnfE:= den_eq0 => [][vd][sd][sdunit nd]; subst den.
-(* have sd_neq0 : sd != 0.
-  by move: den_eq0; rewrite mulf_eq0 negb_or expf_neq0 ?fpsX_eq0.
- *)
 case: (valuatXnP num) => [vn sn sunit|] ->{num}; first last.
   exists 0%N; split; first last.
     case=> [|n'][f']//= [][]/= f'_unit + _.
-    move/eqP; rewrite piE equivfE eq_sym.
+    move=> H; exfalso; move/eqP: H; rewrite piE equivfE eq_sym.
     rewrite !(numer_Ratio, denom_Ratio, expf_neq0, fpsX_eq0) //=.
     rewrite mul0r mulf_eq0 (negbTE den_eq0) /= => /eqP f'0.
     by move: f'_unit; rewrite f'0 unitr0.
