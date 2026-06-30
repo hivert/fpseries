@@ -50,6 +50,21 @@ using Lagrange inversion formula;
  `(1 - 2X) F + (1 - 4X) X F' = 1` which give the recursion
  `(n+2) C(n+1) = (4n + 2) C(n)` and solve it.
 
+## Authors
+
+- Florent Hivert
+
+The code for truncated power series (files auxresults.v and tfps.v) is
+partly copied from
+
+  https://github.com/Barbichu/newtonsums
+
+by
+
+- Cyril Cohen
+- Boris Djalal
+
+## Dependencies
 
 All these files are still largely experimental.
 

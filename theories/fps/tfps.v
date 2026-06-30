@@ -19,6 +19,10 @@
  # *)
 (** * Truncated power series, i.e. polynomials modulo X^n
 
+This is heavily inspired from
+
+https://github.com/Barbichu/newtonsums
+
 In this file, we suppose that \(\mathbf{R}\) is a ring and \(n\) is a positive
 integer.  The goal of this file is to construct the ring
 #\(\mathbf{R}[X]/X^n\)#.
