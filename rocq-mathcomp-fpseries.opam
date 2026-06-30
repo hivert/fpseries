@@ -1,0 +1,42 @@
+opam-version: "2.0"
+maintainer: "florent.hivert@lisn.fr"
+version: "dev"
+
+homepage: "https://github.com/math-comp/fpseries"
+dev-repo: "git+https://github.com/math-comp/fpseries.git"
+bug-reports: "https://github.com/math-comp/fpseries/issues"
+doc: "https://math-comp.github.io/fpseries/"
+license: "LGPL-3.0-or-later"
+
+synopsis: "Formal Power Series in Rocq / MathComp for combinatorics"
+description: """
+
+The goal of this project is to formalize the notion of formal power
+series with applications to enumerative and algebraic
+combinatorics. They are two different formalizations: the first is
+an axiom free formalization of truncated formal power series. It is
+largely based on the work of Cyril Cohen et al. on Newton Sums. In
+the second, using classical axioms, fpseries are defined as the
+inverse limit of the truncated power series allowing to transfer
+easily result between the two settings."""
+
+build: [make "-j%{jobs}%"]
+install: [make "install"]
+depends: [
+  "coq" { (>= "8.18" & < "9.1~") | = "dev" }
+  "coq-mathcomp-ssreflect" {>= "2.5"}
+  "coq-mathcomp-algebra" {>= "2.5"}
+  "coq-mathcomp-multinomials" {>= "2.4"}
+  "coq-hierarchy-builder" {>= "1.9.0"}
+  "coq-mathcomp-classical" {>= "1.14.0"}
+]
+
+tags: [
+  "keyword:algebra"
+  "keyword:combinatorics"
+  "keyword:formal power series"
+  "logpath:"
+]
+authors: [
+  "Florent Hivert"
+]
