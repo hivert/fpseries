@@ -24,7 +24,7 @@ order canonical structures.
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot.
 From mathcomp Require Import order ssralg.
 
 
@@ -81,10 +81,10 @@ Fact addbarA : associative addbar.
 Proof. by case=> [m|] [n|] [p|] //=; rewrite addnA. Qed.
 HB.instance Definition _ :=
   GRing.isNmodule.Build natbar addbarA addbarC add0bar.
-Fact Nat_semi_additive : semi_additive Nat.
+Fact Nat_is_nmod_morphism : nmod_morphism Nat.
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build _ _ Nat Nat_semi_additive.
+  GRing.isNmodMorphism.Build _ _ Nat Nat_is_nmod_morphism.
 
 Lemma addbar_eq0 u v : (u + v == Nat 0)%R = (u == Nat 0) && (v == Nat 0).
 Proof.
@@ -101,7 +101,7 @@ Definition lebar u v :=
   | Nat m, Nat n => m <= n
   | _, _ => false
   end.
-Definition lebar_display : unit. Proof. exact: tt. Qed.
+Definition lebar_display : Order.disp_t. Proof. by []. Qed.
 
 Fact lebar_refl : reflexive lebar.
 Proof. by case=> [m|] /=. Qed.
@@ -128,7 +128,7 @@ Proof. by []. Qed.
 Lemma ltEnatbar (n m : nat) : (Nat n < Nat m) = (n < m)%N.
 Proof. by rewrite lt_neqAle leEnatbar Nat_eqE ltn_neqAle. Qed.
 
-Lemma omorphNat_subproof : Order.order_morphism Nat.
+Lemma omorphNat_subproof : {homo Nat : x y / x <= y}.
 Proof. by move=> x y; rewrite leEnatbar leEnat. Qed.
 HB.instance Definition _ :=
   Order.isOrderMorphism.Build _ _ _ _ Nat omorphNat_subproof.

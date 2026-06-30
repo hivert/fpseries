@@ -39,7 +39,7 @@ In what follows we assume that [p] is a prime number with [p_pr : prime p].
                   canonical structures.
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import all_boot all_algebra.
 From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import order.
 
@@ -77,7 +77,7 @@ Variables m n p : nat.
 Hypothesis (mgt1 : m > 1) (ngt1 : n > 1).
 Hypothesis (mdivn : m %| n).
 
-Lemma Zmn_is_additive : additive (@Zmn m n).
+Lemma Zmn_is_zmod_morphism : zmod_morphism (@Zmn m n).
 Proof.
 move=> /= [i Hi] [j Hj]; rewrite /= /Zmn /inZp.
 apply val_inj; move: Hi Hj; rewrite /= !Zp_cast // => Hi Hj.
@@ -85,9 +85,9 @@ rewrite !modnDml !modnDmr modn_dvdm //.
 by apply/eqP; rewrite eqn_modDl modB //; apply: ltnW.
 Qed.
 
-Lemma Zmn_is_multiplicative : multiplicative (@Zmn m n).
+Lemma Zmn_is_monoid_morphism : monoid_morphism (@Zmn m n).
 Proof.
-split => [[i Hi] [j Hj]|]; rewrite /= /Zmn /inZp //.
+split => [|[i Hi] [j Hj]]; rewrite /= /Zmn /inZp //.
 apply val_inj; move: Hi Hj; rewrite /= !Zp_cast // => Hi Hj.
 by rewrite modn_dvdm // modnMml modnMmr.
 Qed.
@@ -109,7 +109,6 @@ Section PadicInvSys.
 
 Variable (p : nat).
 Hypothesis (p_pr : prime p).
-
 
 Lemma primeX_gt0 l : (0 < p ^ l)%N.
 Proof. by rewrite expn_gt0 prime_gt0. Qed.
@@ -145,16 +144,17 @@ Definition padic_int := {invlim padic_invsys}.
 
 Variables (i j : nat) (H : (i <= j)%O).
 
-Fact bond_is_additive : additive (padic_bond p_pr H).
-Proof. exact/Zmn_is_additive/dvdnX. Qed.
+Fact bond_is_zmod_morphism : zmod_morphism (padic_bond p_pr H).
+Proof. exact/Zmn_is_zmod_morphism/dvdnX. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build ('Z_(p ^ j.+1)) ('Z_(p ^ i.+1)) _  bond_is_additive.
+  GRing.isZmodMorphism.Build
+    ('Z_(p ^ j.+1)) ('Z_(p ^ i.+1)) _ bond_is_zmod_morphism.
 
-Fact bond_is_multiplicative : multiplicative (padic_bond p_pr H).
-Proof. exact/Zmn_is_multiplicative/dvdnX. Qed.
+Fact bond_is_monoid_morphism : monoid_morphism (padic_bond p_pr H).
+Proof. exact/Zmn_is_monoid_morphism/dvdnX. Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build
-    ('Z_(p ^ j.+1)) ('Z_(p ^ i.+1)) _  bond_is_multiplicative.
+  GRing.isMonoidMorphism.Build
+    ('Z_(p ^ j.+1)) ('Z_(p ^ i.+1)) _ bond_is_monoid_morphism.
 
 End PadicInvSys.
 #[global] Hint Resolve primeX_gt0 primeX_gt1 : core.
@@ -289,7 +289,7 @@ rewrite -raddfD /=; apply valuatNatE.
   move: pix piy; rewrite {x}eqx {y}eqy mulrACA -exprD !padicp_MpXn_eq0 {vx vy}.
   rewrite rmorphM /=; move: (_ a) (_ b) => {}a {}b.
   (* Fixed bad mathcomp statement *)
-  have Fp_Zcast : Zp_trunc (pdiv p) = Zp_trunc p by have[]:= Fp_Zcast p_pr.
+  have Fp_Zcast : Zp_trunc (pdiv p) = Zp_trunc p by have:= Fp_Zcast p_pr.
   rewrite expn1 -Fp_Zcast in a b |- *.
   exact: mulf_neq0.
 rewrite natrE=> i lti.
@@ -316,6 +316,8 @@ Proof. by rewrite padic_unit valuat_eq0P. Qed.
 
 Fact padic_mul_eq0 x y : x * y = 0 -> (x == 0) || (y == 0).
 Proof. by move/eqP; rewrite -!valuat0P valuatM addbar_eqI. Qed.
+
+HB.instance Definition _ := GRing.ComUnitRing.on (padic_int p_pr).
 HB.instance Definition _ :=
   GRing.ComUnitRing_isIntegral.Build (padic_int p_pr) padic_mul_eq0.
 
