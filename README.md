@@ -1,6 +1,6 @@
 # Formal Power Series
 
-[![Nix CI for bundle rocq-9.0-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml)
+[![Nix CI for bundle rocq-9.0-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mcmaster](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml)
 
 
 ## Formal power series in Mathematical Components.
