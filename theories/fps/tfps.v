@@ -111,6 +111,7 @@ From mathcomp Require Import all_boot.
 From mathcomp Require Import ssralg poly polydiv ring_quotient.
 Require Import auxresults.
 
+Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
