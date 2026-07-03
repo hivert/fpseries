@@ -162,7 +162,7 @@ Proof.
 case: (ltnP 0 i)=> [Hi|]; last first.
   by rewrite leqn0 => /eqP ->; rewrite C0 bin0 divn1.
 rewrite (CatV i) factS [i.+1 * _]mulnC mulnA.
-by rewrite -{3}(addnK i i) addnn divnMA bin_factd // double_gt0.
+by rewrite bin_factd ?double_gt0 // -{3}addnn addnK divnMA.
 Qed.
 
 End AlgebraicSolution.

@@ -166,7 +166,7 @@ Proof.
 case: (ltnP 0 i)=> [Hi|]; last first.
   by rewrite leqn0 => /eqP ->; rewrite C0 bin0 divn1.
 rewrite (CatV i) factS [i.+1 * _]mulnC mulnA.
-by rewrite -{3}(addnK i i) addnn divnMA bin_factd // double_gt0.
+by rewrite bin_factd ?double_gt0 // -{3}addnn addnK divnMA.
 Qed.
 
 End AlgebraicSolution.
@@ -254,8 +254,7 @@ have -> : tmulX F^`() = (F - 1)/(1 - \X *+ 2 * F).
   rewrite -[_ \X *+ 2]raddfMn -trXntM //= -[in RHS]tmulXM.
   by ring.
 rewrite mulrA -[X in X + _](mulrK X2Fu) -mulrDl -[RHS]divr1.
-apply/eqP; rewrite eq_divr ?unitr1 //; apply/eqP.
-by rewrite !mulr2n; ring: FalgN.
+by apply/eqP; rewrite eq_divr ?unitr1 //; apply/eqP; ring: FalgN.
 Qed.
 
 Local Close Scope ring_scope.
