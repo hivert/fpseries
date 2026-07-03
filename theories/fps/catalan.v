@@ -32,7 +32,7 @@ the formula above. The only definition here is
 *******************************************************************************)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 From mathcomp Require Import fintype div bigop ssralg poly binomial rat ssrnum.
-From mathcomp Require Import ssrZ zify ring lra.
+From mathcomp Require Import zify ring field lra.
 
 Require Import tfps auxresults.
 
@@ -135,8 +135,11 @@ rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=; last first.
   by move=> j _; rewrite /bump /=; field.
 elim: i => [|i IHi]; first by rewrite expr0 big_ord0 double0 fact0 mulr1.
 rewrite big_ord_recr /= exprS -mulrA mulrC mulrA {}IHi.
-rewrite doubleS !factS; rewrite -mul2n; field.
-by rewrite nat1r !Num.Theory.pnatr_eq0 -lt0n fact_gt0 /=.
+have factn0 : i`!%:R != 0 :> rat.
+  by rewrite !Num.Theory.pnatr_eq0 -lt0n fact_gt0.
+have i1n0 : 1 + i%:R != 0 :> rat.
+  by rewrite nat1r !Num.Theory.pnatr_eq0 -lt0n.
+by rewrite doubleS !factS; rewrite -mul2n; field.
 Qed.
 
 Theorem Cat_rat i : (C i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
@@ -149,7 +152,7 @@ Proof.
 have:= Cat_rat i.
 move/(congr1 (fun x => x * (i.+1)`!%:R * i`!%:R)%R).
 rewrite (divrK (fact_unit i.+1)) (divrK (fact_unit i)) // -!natrM => /eqP.
-by rewrite Num.Theory.eqr_nat => /eqP <-; nia.
+by rewrite Num.Theory.eqr_nat => /eqP <-; ring.
 Qed.
 
 Theorem CatV i : C i = i.*2`! %/ (i`! * i.+1`!).
