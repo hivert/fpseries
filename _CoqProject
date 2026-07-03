@@ -5,6 +5,7 @@
 -arg -w -arg -deprecated-since-8.19
 -arg -w -arg -projection-no-head-constant
 -arg -w -arg -notation-incompatible-prefix
+-arg -w -arg -deprecated-since-mathcomp-2.6.0
 theories/fps/directed.v
 theories/fps/invlim.v
 theories/fps/dirlim.v

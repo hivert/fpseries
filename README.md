@@ -1,14 +1,15 @@
-# FormalPowerSeries
+# Formal Power Series
 
-[![Nix CI for bundle coq8.18-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.18-mc2.3.0.yml) [![Nix CI for bundle coq8.19-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.19-mc2.3.0.yml) [![Nix CI for bundle coq8.20-mc2.3.0](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.20-mc2.3.0.yml/badge.svg)](https://github.com/hivert/FormalPowerSeries/actions/workflows/nix-action-coq8.20-mc2.3.0.yml)
+[![Nix CI for bundle rocq-9.0-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mcmaster](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml)
+
 
 ## Formal power series in Mathematical Components.
 
 The goal of this project is to formalize the notion of Formal Power
 Series. I've mainly in view application to enumerative and algebraic
-combinatorics. They are two different formalization:
+combinatorics. They are two different formalizations:
 
-1 - an axiom free formalization of Truncated Formal Power Series. It is
+1 - An axiom free formalization of truncated formal power series (i.e. polynomials mod $X^n$). It is
 largely based on the work of Cyril Cohen et al. on Newton Sums.
 
    https://github.com/math-comp/newtonsums
@@ -40,15 +41,15 @@ To test the framework I provide 6 proofs of the formula for Catalan
 numbers. I'm using the following 3 different strategies together with
 truncated and non-truncated series:
 
-1 - prove the algebraic equation `F = 1 + X F^2` and extract the
-coefficients using square root and Newton's formula;
+1 - prove the algebraic equation $F = 1 + X F^2$ and extract the
+coefficients using square root and generalized Newton's binomial formula;
 
 2 - Start again from the algebraic equation, extract the coefficients
 using Lagrange inversion formula;
 
 3 - Transform the algebraic equation into the holonomic differential equation
- `(1 - 2X) F + (1 - 4X) X F' = 1` which give the recursion
- `(n+2) C(n+1) = (4n + 2) C(n)` and solve it.
+ $(1 - 2X) F + (1 - 4X) X F' = 1$ which give the recursion
+ $(n+2) C_{n+1} = (4n + 2) C_n$ and solve it.
 
 ## Authors
 

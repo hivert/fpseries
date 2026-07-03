@@ -1,15 +1,18 @@
 (** * Combi.tfps : Truncated power series, i.e. polynom mod X^n *)
 (******************************************************************************)
-(*    Copyright (C) 2019-2021 Florent Hivert <florent.hivert@lri.fr>          *)
+(*    Copyright (C) 2019-2026 Florent Hivert <florent.hivert@lisn.fr>         *)
 (*                                                                            *)
-(*  Distributed under the terms of the GNU General Public License (GPL)       *)
+(*    This program is free software; you can redistribute it and/or           *)
+(*    modify it under the terms of the GNU Lesser General Public              *)
+(*    License as published by the Free Software Foundation; either            *)
+(*    version 3 of the License, or (at your option) any later version.        *)
 (*                                                                            *)
 (*    This code is distributed in the hope that it will be useful,            *)
 (*    but WITHOUT ANY WARRANTY; without even the implied warranty of          *)
 (*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU       *)
 (*    General Public License for more details.                                *)
 (*                                                                            *)
-(*  The full text of the GPL is available at:                                 *)
+(*    The full text of the LGPL is available at:                              *)
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
@@ -111,6 +114,7 @@ From mathcomp Require Import all_boot.
 From mathcomp Require Import ssralg poly polydiv ring_quotient.
 Require Import auxresults.
 
+Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
