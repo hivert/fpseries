@@ -9,28 +9,29 @@ The goal of this project is to formalize the notion of Formal Power
 Series. I've mainly in view application to enumerative and algebraic
 combinatorics. They are two different formalizations:
 
-1 - An axiom free formalization of truncated formal power series (i.e. polynomials mod $X^n$). It is
-largely based on the work of Cyril Cohen et al. on Newton Sums.
+1 - An axiom free formalization of truncated formal power series
+(i.e. polynomials mod $X^n$). It is largely based on the work of Cyril
+Cohen et al. on Newton Sums.
 
    https://github.com/math-comp/newtonsums
 
-The main difference is that they assumed the base ring to be a field whereas I
-tried to use the more general base ring setting to formalize the different
-properties.
+The main difference is that they assumed the base ring to be a field
+whereas I tried to use the more general base ring (or even semi-ring)
+setting to formalize the different properties.
 
-2 - Formal Power Series using classical axioms. These are defined as the
-inverse limit of the truncated power series allowing to transfer easily result
-between the two settings.
+2 - Formal Power Series using classical axioms. These are defined as
+the inverse limit of the truncated power series allowing to transfer
+easily result between the two settings.
 
 The main results are
-- formula for the multiplicative inverse of a series both in a commutative and
-  non-commutative setting;
+- formula for the multiplicative inverse of a series both in a
+  commutative and non-commutative setting;
 - geometric series;
 - formal derivative and primitive (commutative and non-commutative);
 - composition of power series (assuming the inner one has zero constant
   coefficient);
 - Lagrange inversion formulas (Lagrange-Bürmann theorem);
-- exponential and logarithm series.
+- exponential, logarithm, powering and square root series.
 
 All those results are proved both for truncated and non-truncated series.
 
