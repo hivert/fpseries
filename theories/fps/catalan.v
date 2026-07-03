@@ -316,7 +316,7 @@ Qed.
 
 Theorem Cat_from_rec i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
-by have:= congr1 (fun m => m %/ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
+by have:= congr1 (divn^~ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
 Qed.
 
 End HolonomicSolution.
