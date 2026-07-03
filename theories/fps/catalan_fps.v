@@ -51,12 +51,12 @@ Hypothesis Cat0 : Cat 0 = 1%N.
 Hypothesis CatS :
   forall n : nat, Cat n.+1 = \sum_(i < n.+1) Cat i * Cat (n - i).
 
-Local Definition Csimpl := (Cat0, CatS, big_ord0, big_ord_recl).
-Example Cat1 : Cat 1 = 1.  Proof. by rewrite !Csimpl. Qed.
-Example Cat2 : Cat 2 = 2.  Proof. by rewrite !Csimpl. Qed.
-Example Cat3 : Cat 3 = 5.  Proof. by rewrite !Csimpl. Qed.
-Example Cat4 : Cat 4 = 14. Proof. by rewrite !Csimpl. Qed.
-Example Cat5 : Cat 5 = 42. Proof. by rewrite !Csimpl. Qed.
+Local Definition Catsimpl := (Cat0, CatS, big_ord0, big_ord_recl).
+Example Cat1 : Cat 1 = 1.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat2 : Cat 2 = 2.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat3 : Cat 3 = 5.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat4 : Cat 4 = 14. Proof. by rewrite !Catsimpl. Qed.
+Example Cat5 : Cat 5 = 42. Proof. by rewrite !Catsimpl. Qed.
 
 Import GRing.Theory.
 
@@ -280,7 +280,7 @@ have := congr1 (fun x => (x``_n.+1)%R) FC_differential_eq.
 rewrite coefs1 coefsD !mulrDl !mul1r !coefsD.
 rewrite -!mulNrn !(mulrnAl, coefsMn, mulNr, coefsN).
 rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coefs_FPSeries.
-case: n => [|n] /=; first by rewrite !Csimpl.
+case: n => [|n] /=; first by rewrite !Catsimpl.
 move: {n} n.+1 => n; move: (Cat n.+1) (Cat n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
 move/eqP; rewrite subr_eq add0r subr_eq -natrD Num.Theory.eqr_nat => /eqP.
