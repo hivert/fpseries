@@ -292,8 +292,8 @@ End TruncFPSDef.
 (* We need to break off the section here to let the Bind Scope directives     *)
 (* take effect.                                                               *)
 Bind Scope tfps_scope with truncfps.
-Arguments tfps {R n%N}.
-Arguments tfps_inj {R} [p1%R p2%R] : rename.
+Arguments tfps {R n%_N}.
+Arguments tfps_inj {R} [p1%_R p2%_R] : rename.
 Notation "{ 'tfps' R n }" :=  (truncfps R n).
 Arguments coeftfps /.
 
@@ -2439,11 +2439,9 @@ Qed.
 End CompComSemiRing.
 
 
-Section Lagrange.
-
-Variables R : comUnitRingType.
-
 Section LagrangeFixPoint.
+
+Variables R : unitRingType.
 
 Variable n : nat.
 Variable g : {tfps R n}.
@@ -2505,6 +2503,19 @@ Proof. by rewrite {1}lagrfixP tmulXK. Qed.
 Lemma tdivX_lagrfix_unit : tdivX lagrfix \is a GRing.unit.
 Proof. by rewrite lagrfix_divP unit_tfpsE coef0_comp_tfps -unit_tfpsE. Qed.
 
+End LagrangeFixPoint.
+
+
+Section Lagrange.
+
+Variables R : comUnitRingType.
+Variable n : nat.
+
+Section Inverse.
+
+Variable g : {tfps R n}.
+Hypothesis gU : g \is a GRing.unit.
+
 Lemma lagrfix_inv f :
   f \in coeft0_eq0 -> f = tmulX (g \oT trXnt n f) -> (tmulX g^-1) \oT f = \X.
 Proof.
@@ -2516,12 +2527,10 @@ rewrite (rmorphV _ gU) //= divrr ?tmulX1 //.
 by rewrite unit_tfpsE coef0_comp_tfps -unit_tfpsE.
 Qed.
 
-Lemma lagrfix_invPr : (tmulX g^-1) \oT lagrfix = \X.
-Proof. exact: (lagrfix_inv coeft0_eq0_lagrfix lagrfixP). Qed.
+Lemma lagrfix_invPr : (tmulX g^-1) \oT lagrfix g = \X.
+Proof. exact: (lagrfix_inv (coeft0_eq0_lagrfix g) (lagrfixP g)). Qed.
 
-End LagrangeFixPoint.
-
-Variable n : nat.
+End Inverse.
 
 Lemma lagriter_trXnt (f : {tfps R n}) i m :
   i <= m.+1 -> lagriter (trXnt m f) i = lagriter f i.
