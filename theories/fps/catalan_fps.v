@@ -46,17 +46,18 @@ Unset Printing Implicit Defensive.
 (** ** The generating series of Catalan numbers *)
 Section Catalan.
 
-Variable (C : nat -> nat).
+Variable (Cat : nat -> nat).
 
-Hypothesis C0 : C 0 = 1%N.
-Hypothesis CS : forall n : nat, C n.+1 = \sum_(i < n.+1) C i * C (n - i).
+Hypothesis Cat0 : Cat 0 = 1%N.
+Hypothesis CatS :
+  forall n : nat, Cat n.+1 = \sum_(i < n.+1) Cat i * Cat (n - i).
 
-Local Definition Csimpl := (C0, CS, big_ord0, big_ord_recl).
-Example C1 : C 1 = 1.  Proof. by rewrite !Csimpl. Qed.
-Example C2 : C 2 = 2.  Proof. by rewrite !Csimpl. Qed.
-Example C3 : C 3 = 5.  Proof. by rewrite !Csimpl. Qed.
-Example C4 : C 4 = 14. Proof. by rewrite !Csimpl. Qed.
-Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
+Local Definition Catsimpl := (Cat0, CatS, big_ord0, big_ord_recl).
+Example Cat1 : Cat 1 = 1.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat2 : Cat 2 = 2.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat3 : Cat 3 = 5.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat4 : Cat 4 = 14. Proof. by rewrite !Catsimpl. Qed.
+Example Cat5 : Cat 5 = 42. Proof. by rewrite !Catsimpl. Qed.
 
 Import GRing.Theory.
 
@@ -70,17 +71,17 @@ Section GenSeries.
 Local Open Scope ring_scope.
 Local Open Scope fps_scope.
 
-Definition FC : {fps rat} := \fps (C i)%:R .X^i.
+Definition FC : {fps rat} := \fps (Cat i)%:R .X^i.
 
 Lemma FC_in_coef0_eq1 : FC \in coefs0_eq1.
-Proof. by rewrite coefs0_eq1E coefs_FPSeries C0. Qed.
+Proof. by rewrite coefs0_eq1E coefs_FPSeries Cat0. Qed.
 
 Proposition FC_algebraic_eq : FC = 1 + ''X * FC ^+ 2.
 Proof.
 rewrite /FC; apply/fpsP => i.
 rewrite !(coefs_FPSeries, coefs_simpl).
-case: i => [|i]; first by rewrite C0 addr0.
-rewrite add0r CS /= expr2 coefsM natr_sum.
+case: i => [|i]; first by rewrite Cat0 addr0.
+rewrite add0r CatS /= expr2 coefsM natr_sum.
 apply eq_bigr => [[j /= _]] _.
 by rewrite !coefs_FPSeries natrM.
 Qed.
@@ -138,12 +139,12 @@ have i1n0 : 1 + i%:R != 0 :> rat.
 by rewrite doubleS !factS; rewrite -mul2n; field.
 Qed.
 
-Theorem Cat_rat i : (C i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
+Theorem Cat_rat i : (Cat i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
 Proof. by rewrite -coefFC coefs_FPSeries. Qed.
 
 Local Close Scope ring_scope.
 
-Theorem CatM i : C i * i`! * i.+1`! = i.*2`!.
+Theorem CatM i : Cat i * i`! * i.+1`! = i.*2`!.
 Proof.
 have:= Cat_rat i.
 move/(congr1 (fun x => x * (i.+1)`!%:R * i`!%:R)%R).
@@ -151,16 +152,16 @@ rewrite (divrK (fact_unit i.+1)) (divrK (fact_unit i)) // -!natrM => /eqP.
 by rewrite Num.Theory.eqr_nat => /eqP <-; nia.
 Qed.
 
-Theorem CatV i : C i = i.*2`! %/ (i`! * i.+1`!).
+Theorem CatV i : Cat i = i.*2`! %/ (i`! * i.+1`!).
 Proof.
 have:= CatM i; rewrite -mulnA => /(congr1 (fun j => j %/ (i`! * (i.+1)`!))).
 by rewrite mulnK // muln_gt0 !fact_gt0.
 Qed.
 
-Theorem Cat i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem CatE i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
 case: (ltnP 0 i)=> [Hi|]; last first.
-  by rewrite leqn0 => /eqP ->; rewrite C0 bin0 divn1.
+  by rewrite leqn0 => /eqP ->; rewrite Cat0 bin0 divn1.
 rewrite (CatV i) factS [i.+1 * _]mulnC mulnA.
 by rewrite bin_factd ?double_gt0 // -{3}addnn addnK divnMA.
 Qed.
@@ -186,12 +187,12 @@ apply: (lagrfix_uniq one_plusX_2_unit).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
 rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //; first by ring.
 rewrite coefs0_eq0E coefsB coefs1.
-by rewrite coefs_FPSeries /= C0 subrr.
+  by rewrite coefs_FPSeries /= Cat0 subrr.
 Qed.
 
-Theorem CatM_Lagrange i : (i.+1 * (C i))%N = 'C(i.*2, i).
+Theorem CatM_Lagrange i : (i.+1 * (Cat i))%N = 'C(i.*2, i).
 Proof.
-case: i => [|i]; first by rewrite C0 mul1n bin0.
+case: i => [|i]; first by rewrite Cat0 mul1n bin0.
 apply/eqP; rewrite -(Num.Theory.eqr_nat rat); rewrite natrM.
 have:= (congr1 (fun s => s``_i.+1) FC_fixpoint_eq).
 rewrite !coefs_simpl coefs_FPSeries subr0 /= => ->.
@@ -210,7 +211,7 @@ Qed.
 
 Local Close Scope ring_scope.
 
-Theorem Cat_Lagrange i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem Cat_Lagrange i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
 by have:= congr1 (fun m => m %/ i.+1) (CatM_Lagrange i); rewrite mulnC mulnK.
 Qed.
@@ -235,7 +236,7 @@ have FalgN : ''X * FC ^+ 2 = FC - 1.
   by apply/eqP; rewrite eq_sym subr_eq addrC -FC_algebraic_eq.
 have -> : ''X * FC^`()%fps = (FC - 1)/(1 - ''X *+ 2 * FC).
   rewrite -[LHS]divr1; apply/eqP.
-  rewrite (eq_divr (''X * _)) ?unitr1 // ?X2Fu // mulr1.
+  rewrite (eq_divr (''X * _)) ?unitr1 // ?X2Fu // mulr1; apply/eqP.
   have /= := congr1 ((fun s => ''X * s) \o (@deriv_fps _)) FC_algebraic_eq.
   rewrite derivD_fps deriv_fps1 add0r.
   rewrite derivM_fps /= deriv_fpsX mul1r derivX_fps /= expr1.
@@ -249,22 +250,22 @@ Qed.
 Local Close Scope ring_scope.
 Local Close Scope tfps_scope.
 
-Proposition Catalan_rec n : n.+2 * C (n.+1) = (4 * n + 2) * C n.
+Proposition Catalan_rec n : n.+2 * Cat (n.+1) = (4 * n + 2) * Cat n.
 Proof.
 have := congr1 (fun x => (x``_n.+1)%R) FC_differential_eq.
 rewrite coefs1 coefsD !mulrDl !mul1r !coefsD.
 rewrite -!mulNrn !(mulrnAl, coefsMn, mulNr, coefsN).
 rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coefs_FPSeries.
-case: n => [|n] /=; first by rewrite !Csimpl.
-move: {n} n.+1 => n; move: (C n.+1) (C n) => Cn1 Cn.
+case: n => [|n] /=; first by rewrite !Catsimpl.
+move: {n} n.+1 => n; move: (Cat n.+1) (Cat n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
 move/eqP; rewrite subr_eq add0r subr_eq -natrD Num.Theory.eqr_nat.
 by nia.
 Qed.
 
-Theorem CatM_from_rec n : n.+1 * C n = 'C(n.*2, n).
+Theorem CatM_from_rec n : n.+1 * Cat n = 'C(n.*2, n).
 Proof.
-elim: n => [| n IHn] /=; first by rewrite C0 bin0.
+elim: n => [| n IHn] /=; first by rewrite Cat0 bin0.
 rewrite Catalan_rec doubleS !binS.
 have leq_n2 : n <= n.*2 by rewrite -addnn leq_addr.
 rewrite -[X in _ + _ + X]bin_sub; last exact: (leq_trans leq_n2 (leqnSn _)).
@@ -277,9 +278,9 @@ rewrite -mulnA ![n.+1 * _]mulnC => /(congr1 (fun m => m %/ n.+1)).
 by rewrite !mulnK.
 Qed.
 
-Theorem Cat_from_rec i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem Cat_from_rec i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
-by have:= congr1 (fun m => m %/ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
+by have:= congr1 (divn^~ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
 Qed.
 
 End HolonomicSolution.
