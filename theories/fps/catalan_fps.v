@@ -241,7 +241,7 @@ have -> : ''X * FC^`()%fps = (FC - 1)/(1 - ''X *+ 2 * FC).
   rewrite derivD_fps deriv_fps1 add0r.
   rewrite derivM_fps /= deriv_fpsX mul1r derivX_fps /= expr1.
   rewrite mulrDr FalgN => /eqP; rewrite -(subr_eq _ _ (''X * _)) => /eqP <-.
-  by apply/eqP => /=; ring.
+  by ring.
 rewrite mulrA -[X in X + _](mulrK X2Fu) -mulrDl -[RHS]divr1.
 apply/eqP; rewrite eq_divr ?unitr1 //; apply/eqP.
 by rewrite !mulr2n; ring: FalgN.
