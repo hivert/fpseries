@@ -256,9 +256,9 @@ End DefsSemiRing.
 (* directives take effect.                                         *)
 Bind Scope ring_scope with fpseries.
 
-Arguments seriesfun {R} f%R.
-Arguments seriesfun_inj {R} [s1%R s2%R] : rename.
-Arguments coef_series {R} s%R i%N.
+Arguments seriesfun {R} f%_R.
+Arguments seriesfun_inj {R} [s1%_R s2%_R] : rename.
+Arguments coef_series {R} s%_R i%_N.
 
 Notation "s ``_ i" := (coef_series s i).
 Notation "\fps E .X^ i" := (FPSeries (fun i : nat => E)).
