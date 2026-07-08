@@ -52,6 +52,10 @@ using Lagrange inversion formula;
  $(1 - 2X) F + (1 - 4X) X F' = 1$ which give the recursion
  $(n+2) C_{n+1} = (4n + 2) C_n$ and solve it.
 
+## Presentation
+
+The [slide](https://mathcomp-schools.gitlabpages.inria.fr/2022-12-school/assets/pdf/talk-hivert.pdf) of a talk at [Mathematical Components - 10 years after the Odd Order Theorem](https://mathcomp-schools.gitlabpages.inria.fr/2022-12-school/workshop).
+
 ## Authors
 
 - Florent Hivert
