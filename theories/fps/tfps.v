@@ -3083,6 +3083,15 @@ Qed.
 Lemma expB : {in @coeft0_eq0 R n &, {morph exp : f g / f - g >-> f / g}}.
 Proof. by move=> f g hf hg; rewrite expD ?rpredN // expN. Qed.
 
+Lemma exp_sum (I : eqType) (r : seq I) (P : pred I) (F : I -> {tfps R n}) :
+  (forall i, P i -> F i \in coeft0_eq0) ->
+  exp (\sum_(i <- r | P i) F i) = \prod_(i <- r | P i) exp (F i).
+Proof.
+move=> H; apply (big_morph_in (@coeft0_eq0D R n)
+                   (zero_in_coeft0_eq0 R n) expD (exp0 R n)).
+by apply/allP => /= f /mapP[i]; rewrite mem_filter => /andP[/H Fiin _ ->].
+Qed.
+
 End ExpMorph.
 
 
@@ -3281,6 +3290,14 @@ Qed.
 Lemma log_div : {in coeft0_eq1 &, {morph (@log R n) : f g / f / g >-> f - g}}.
 Proof. by move=> f g f0_eq1 g0_eq1 /=; rewrite logM ?rpredV // logV. Qed.
 
+Lemma log_prod (I : eqType) (r : seq I) (P : pred I) (F : I -> {tfps R n}) :
+  (forall i, P i -> F i \in coeft0_eq1) ->
+  log (\prod_(i <- r | P i) F i) = \sum_(i <- r | P i) log (F i).
+Proof.
+pose mulcl := mulr_closed_coeft0_eq1 R n.
+move=> H; apply: (big_morph_in mulcl.2 mulcl.1 logM (log1 _ _)).
+by apply/allP => /= f /mapP[i]; rewrite mem_filter => /andP[/H Fiin _ ->].
+Qed.
 
 Section ExprTfps.
 
@@ -3467,6 +3484,7 @@ Definition derivXn_tfps       := TFPSUnitRing.derivXn_tfps.
 Definition expD               := TFPSUnitRing.expD               nuf.
 Definition expN               := TFPSUnitRing.expN               nuf.
 Definition expB               := TFPSUnitRing.expB               nuf.
+Definition exp_sum            := TFPSUnitRing.exp_sum            nuf.
 Definition deriv_tfps_eq0_cst := TFPSUnitRing.deriv_tfps_eq0_cst nuf.
 Definition deriv_tfps_ex_eq0  := TFPSUnitRing.deriv_tfps_ex_eq0  nuf.
 Definition deriv_tfps_eq0     := TFPSUnitRing.deriv_tfps_eq0     nuf.
@@ -3485,6 +3503,7 @@ Definition log_inj            := TFPSUnitRing.log_inj            nuf.
 Definition logM               := TFPSUnitRing.logM               nuf.
 Definition logV               := TFPSUnitRing.logV               nuf.
 Definition log_div            := TFPSUnitRing.log_div            nuf.
+Definition log_prod           := TFPSUnitRing.log_prod           nuf.
 Definition coeft0_eq1_expr    := TFPSUnitRing.coeft0_eq1_expr.
 Definition expr_tfpsn         := TFPSUnitRing.expr_tfpsn         nuf.
 Definition expr_tfps0         := TFPSUnitRing.expr_tfps0.
