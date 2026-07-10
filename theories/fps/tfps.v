@@ -151,8 +151,8 @@ Lemma index_translation (m j : nat) (F : nat -> R) :
   \big[op/idx]_(i < m - j) F i =
   \big[op/idx]_(k < m | j <= k) F (k - j).
 Proof.
-rewrite -(big_mkord predT F) /= (big_mknat _ j m (fun k => F (k - j))).
-rewrite -{2}[j]add0n (big_addn 0 m j _ _).
+rewrite -(big_mkord predT F) -(big_geq_mkord j m predT (fun i => F (i - j))) /=.
+rewrite -{2}[j]add0n big_addn.
 by apply: eq_bigr => i _ ; rewrite addnK.
 Qed.
 
@@ -2931,9 +2931,10 @@ Proof.
 rewrite /log /logt => f0_eq1; apply tfpsP => i le_in.
 rewrite raddfN !coeftN /=; congr (- _).
 rewrite (coef_comp_tfps_leq (l := n)) -?coeft0_eq10 // coeft_sum /=.
-rewrite -big_mknat /= [RHS]big_mkcond /=; apply eq_bigr => j _.
-rewrite coef_tfps_of_fun -ltnS ltn_ord coeftZ lt0n.
-by case: eqP => //= _; rewrite mul0r.
+rewrite big_mknat /= big_ltn // inordK //=.
+rewrite coef_tfps_of_fun /= mul0r add0r.
+rewrite !big_nat; apply eq_bigr => j /andP[le1j /[!ltnS] ltjn].
+by rewrite inordK // coef_tfps_of_fun ltjn coeftZ -lt0n le1j.
 Qed.
 
 Lemma log_coeft0_eq1_val f : f \in coeft0_eq1 ->
