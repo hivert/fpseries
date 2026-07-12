@@ -88,6 +88,9 @@ Standard operation on power series:
 - [prim p]  == the primitive [p] in the ring [{poly R}].
 - [\int p]  == [prim_tfps p] (in [tfps_scope]) the primitive [p] in the ring
                   [{tfps R n.+1}].
+- [hmul_tfps f g] == the Hadamard product of [f] ang [g] that is the series
+                 whose i-th coefficient is the product of the i-th
+                 coefficients of [f] and [g].
 
 Composition of truncated power series and Lagrange inversion:
 
@@ -510,14 +513,13 @@ HB.instance Definition _ :=
 
 Lemma tfpsC0 : (0%:S : {tfps R n}) = 0.
 Proof. exact: raddf0. Qed.
-Lemma tfpsCB : {morph (@tfpsC R n) : a b / a + b}.
+Lemma tfpsCD : {morph (@tfpsC R n) : a b / a + b}.
 Proof. exact: raddfD. Qed.
+Lemma tfpsCMn m : {morph (@tfpsC R n) : c / c *+ m}.
+Proof. exact: raddfMn. Qed.
 Lemma tfpsC_sum I (r : seq I) (s : pred I) (F : I -> R) :
   (\sum_(i <- r | s i) F i)%:S = \sum_(i <- r | s i) (F i)%:S.
 Proof. exact: raddf_sum. Qed.
-
-Lemma tfpsCMn m : {morph (@tfpsC R n) : c / c *+ m}.
-Proof. exact: raddfMn. Qed.
 
 Lemma tfpsC_eq0 (c : R) : (c%:S == 0 :> {tfps R n}) = (c == 0).
 Proof. by rewrite -tfpsC0; apply/inj_eq/tfpsC_inj. Qed.
@@ -762,7 +764,7 @@ HB.instance Definition _ :=
 
 Lemma tfpsCN : {morph (@tfpsC R n) : c / - c}.
 Proof. exact: raddfN. Qed.
-Lemma tfpsCD : {morph (@tfpsC R n) : a b / a - b}.
+Lemma tfpsCB : {morph (@tfpsC R n) : a b / a - b}.
 Proof. exact: raddfB. Qed.
 
 Lemma tfpsCMNn m : {morph (@tfpsC R n) : c / c *- m}.
@@ -1271,6 +1273,13 @@ Definition map_tfps g := MkTfps (map_tfps_subproof g).
 Lemma coef_map_tfps i g : (map_tfps g)`_i = F (g`_i).
 Proof. by rewrite coef_map. Qed.
 
+Lemma  map_tfpsX : map_tfps \X = \X.
+Proof.
+apply/tfpsP => i _; rewrite coef_map_tfps !coef_tfpsX.
+case: eqP => _; rewrite ?mul0r ?rmorph0 //= !mul1r.
+by case: eqP => _; rewrite ?rmorph0 ?rmorph1.
+Qed.
+
 Lemma map_tfpsM g h : map_tfps (g * h) = (map_tfps g) * (map_tfps h).
 Proof.
 apply/tfpsP => i Hi.
@@ -1317,7 +1326,7 @@ Proof. by apply/tfpsP => i le_in; rewrite !(coef_trXn, le_in, coef_map). Qed.
 Local Notation "g '^f'" := (map_tfps g).
 Local Notation "f *h g" := (hmul_tfps f g) (at level 2).
 
-Lemma map_hmul g h : (g *h h) ^f = (g ^f) *h (h ^f).
+Lemma map_hmul_tfps g h : (g *h h) ^f = (g ^f) *h (h ^f).
 Proof.
 apply/tfpsP => i le_in /=.
 rewrite coef_map !coef_poly ltnS le_in [LHS]rmorphM.
@@ -1401,6 +1410,12 @@ Lemma coeft0_eq1_add01 f g :
 Proof.
 rewrite coeft0_eq0E !coeft0_eq1E coefD => /eqP -> /eqP ->.
 by rewrite add0r.
+Qed.
+
+Lemma tfps1cX_in_coeft0_eq1 c : 1 + c *: \Xo(n) \in coeft0_eq1.
+Proof.
+rewrite coeft0_eq1E coeftD coeft1.
+by rewrite coeftZ coef_tfpsE val_tfpsX coefZ coefX !mulr0 addr0.
 Qed.
 
 End Coefficient01SemiRing.
@@ -1585,8 +1600,6 @@ Qed.
 End MoreExpPolyRing.
 
 
-(* We state the lemmas with a general f and then with \X       *)
-(* because substitution is not a non-commutative ring morphism *)
 Lemma coeft_geometric (R : nzSemiRingType) (n m : nat) :
   m <= n -> (\sum_(i < n.+1) \X ^+ i : {tfps R n})`_m = 1.
 Proof.
@@ -1597,6 +1610,8 @@ by rewrite !coef_tfps_sumfXi.
 Qed.
 
 
+(** We state the lemmas with a general f and then with \X       *)
+(** because substitution is not a non-commutative ring morphism *)
 Section GeometricSeriesRing.
 
 Variables (R : nzRingType) (n : nat).
@@ -1624,6 +1639,9 @@ Qed.
 Lemma geometrictMl : (\sum_(i < n.+1) \X ^+ i) * (1 - \X) = 1 :> {tfps R n}.
 Proof. exact: geometrictMrf (tfpsX_in_coeft0_eq0 _ _). Qed.
 
+Lemma geometrictMr : (1 - \X) * (\sum_(i < n.+1) \X ^+ i) = 1 :> {tfps R n}.
+Proof. exact: geometrictMlf (tfpsX_in_coeft0_eq0 _ _). Qed.
+
 End GeometricSeriesRing.
 
 
@@ -1644,7 +1662,7 @@ Qed.
 Lemma geometrict : (1 - \X)^-1 = \sum_(i < n.+1) \X ^+ i :> {tfps R n}.
 Proof. exact: geometrictV (tfpsX_in_coeft0_eq0 _ _). Qed.
 
-Lemma geometrict_1cNV c :
+Lemma geometrict_1cNXV c :
   (1 - c *: \Xo(n))^-1 = \sum_(i < n.+1) c ^+ i *: \X ^+ i.
 Proof.
 rewrite (eq_bigr (fun i : 'I_n.+1 => (c *: \X)^+ i)); first last.
@@ -1652,13 +1670,13 @@ rewrite (eq_bigr (fun i : 'I_n.+1 => (c *: \X)^+ i)); first last.
 exact/geometrictV/coeft0_eq0Z/tfpsX_in_coeft0_eq0.
 Qed.
 
-Lemma coef_geometrict_1cNV c m :
+Lemma coef_geometrict_1cNXV c m :
   m <= n -> ((1 - c *: \Xo(n))^-1)`_m = c ^+ m.
-Proof. by move=> le_mn; rewrite geometrict_1cNV coef_tfps_sumfXi. Qed.
+Proof. by move=> le_mn; rewrite geometrict_1cNXV coef_tfps_sumfXi. Qed.
 
-Lemma coef_geometrict_1cV c m :
+Lemma coef_geometrict_1cXV c m :
   m <= n -> ((1 + c *: \Xo(n))^-1)`_m = (-c) ^+ m.
-Proof. by rewrite -{1}[c]opprK scaleNr; apply: coef_geometrict_1cNV. Qed.
+Proof. by rewrite -{1}[c]opprK scaleNr; apply: coef_geometrict_1cNXV. Qed.
 
 End GeometricSeriesUnit.
 
@@ -1914,6 +1932,11 @@ Variables (R : nzSemiRingType).
 Lemma deriv_tfpsX n : \Xo(n.+1)^`() = 1  :> {tfps R n}.
 Proof. by rewrite deriv_tfpsE val_tfpsX scale1r derivX trXn1. Qed.
 
+Lemma deriv_tfps1cX n c : (1 + c *: \Xo(n.+1))^`() = c%:S :> {tfps R n}.
+Proof.
+by rewrite linearD /= deriv_tfps1 add0r linearZ /= -alg_tfpsC deriv_tfpsX.
+Qed.
+
 Lemma deriv_trXnt m n (p : {tfps R m}) :
   (trXnt n.+1 p)^`()%tfps = trXnt n p^`()%tfps.
 Proof.
@@ -1947,6 +1970,15 @@ rewrite exprS derivM_tfps big_ord_recl subn0 expr0 mul1r rmorphXn /=.
 congr (_ + _).
 rewrite {}IHk mulr_sumr; apply eq_bigr => i _.
 by rewrite /bump /= add1n subSS !mulrA -exprS.
+Qed.
+
+Variables (S : nzSemiRingType) (F : {rmorphism R -> S}) (n : nat).
+
+Lemma map_deriv_tfps (f : {tfps R n}) :
+  map_tfps F f^`() = (map_tfps F f)^`().
+Proof.
+apply/tfpsP => i lein1.
+by rewrite !(coef_deriv_tfps, coef_map_tfps) /= raddfMn.
 Qed.
 
 End MoreDerivative.
@@ -2031,7 +2063,6 @@ Variables (R : unitRingType) (n : nat).
 
 Definition prim (p : {poly R}) :=
   \poly_(i < (size p).+1) (p`_i.-1 *+ (i != 0%N) / (i%:R)).
-
 Local Notation "\int p" := (prim p).
 
 Lemma coef_prim (p : {poly R}) (i : nat) :
@@ -2149,7 +2180,7 @@ Proof. by rewrite coef_poly eqxx mulr0n invr0 mulr0. Qed.
 
 End Primitive.
 
-Notation "\int f" := (prim_tfps f) : tfps_scope.
+Notation "\int f" := (prim_tfps f) (at level 10) : tfps_scope.
 
 
 Section MoreCompPoly.
@@ -2345,6 +2376,43 @@ Qed.
 End Composition.
 
 Notation "f \oT g" := (comp_tfps g f) : tfps_scope.
+
+
+Section CompMap.
+
+Variables (K L : nzSemiRingType) (n : nat) (F : {rmorphism K -> L}).
+
+Implicit Type g f : {tfps K n}.
+
+Lemma map_comp_tfps g f :
+  f \in coeft0_eq0 ->
+  map_tfps F (g \oT f) = (map_tfps F g) \oT (map_tfps F f).
+Proof.
+rewrite (tfps_def g) => f0; rewrite !raddf_sum /=; apply: eq_bigr => i _.
+rewrite !linearZ /= comp_tfpsXn // !rmorphXn /= map_tfpsX.
+by rewrite comp_tfpsXn //; apply/eqP; rewrite coef_map_tfps (eqP f0) rmorph0.
+Qed.
+
+End CompMap.
+
+
+Section CompComRing.
+
+Variables (R : comNzRingType) (n : nat).
+
+Lemma comp_tfpsNXK : involutive (@comp_tfps R n (-\X)).
+Proof.
+have NXin : -\X \in @coeft0_eq0 R n by rewrite rpredN tfpsX_in_coeft0_eq0.
+move=> f; rewrite (tfps_def f) raddf_sum /=.
+under eq_bigr => /= i _.
+  by rewrite linearZ /= (comp_tfpsXn _ NXin); over.
+rewrite /= !raddf_sum /=; apply eq_bigr => i _.
+rewrite !linearZ /= -{2}scaleN1r exprZn linearZ /= scalerA.
+rewrite (comp_tfpsXn _ NXin) -scaleN1r exprZn scalerA.
+by rewrite -mulrA -exprMn mulN1r opprK expr1n mulr1.
+Qed.
+
+End CompComRing.
 
 
 Section CompUnitRing.
@@ -2651,10 +2719,23 @@ Qed.
 End Lagrange.
 
 
+Section UnitCharacteristic.
+
+Definition nat_unit (R : unitRingType) :=
+  forall i, i.+1%:R \is a @GRing.unit R.
+Variable (R S : unitRingType) (F : {rmorphism R -> S}).
+Hypothesis (nat_unitR : nat_unit R).
+
+Lemma rmorph_nat_unit : nat_unit S.
+Proof. by move=> i; rewrite /= -(rmorph_nat F) rmorph_unit // nat_unit. Qed.
+
+End UnitCharacteristic.
+
+
 Section LagrangeTheorem.
 
 Variables R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 
 (* TODO: nat_unit is not needed here *)
 Lemma tmulX_deriv_expE n (g : {tfps R n.+1}) i :
@@ -2962,6 +3043,7 @@ Arguments exp {R n}.
 Notation "f ^^ r" := (expr_tfps r f) : tfps_scope.
 
 
+
 Section TrXntExpLog.
 
 Variables (R : unitRingType) (n m : nat)  (f : {tfps R n}).
@@ -2979,10 +3061,18 @@ End TrXntExpLog.
 
 Module TFPSUnitRing.
 
+Lemma nat_unit_alg (R : comUnitRingType) (nat_unitR : nat_unit R)
+  (A : unitAlgType R) : nat_unit A.
+Proof. by move=> i; rewrite /= -scaler_nat scaler_unit ?unitr1. Qed.
+
 Section PrimitiveUnitRing.
 
 Variable R : unitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
+
+Lemma fact_unit m : m`!%:R \is a @GRing.unit R.
+Proof. by have:= fact_gt0 m; rewrite lt0n; case: m`! => //= i _. Qed.
+
 Variable n : nat.
 
 Fact natmul_inj (m : nat) : (m%:R == 0 :> R) = (m == 0%N).
@@ -3037,18 +3127,11 @@ End PrimitiveUnitRing.
 Section ExpMorph.
 
 Variable R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 Variable n : nat.
 
 
-Lemma nat_unit_alg (A : unitAlgType R) i : i.+1%:R \is a @GRing.unit A.
-Proof. by rewrite -scaler_nat scaler_unit ?unitr1 ?nat_unit. Qed.
-
-
 Implicit Types (f g : {tfps R n}).
-
-Lemma fact_unit m : m`!%:R \is a @GRing.unit R.
-Proof. by have:= fact_gt0 m; rewrite lt0n; case: m`!. Qed.
 
 Theorem expD : {in @coeft0_eq0 R n &, {morph exp : f g / f + g >-> f * g}}.
 Proof.
@@ -3099,7 +3182,7 @@ End ExpMorph.
 Section MoreDerivative.
 
 Variable R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 Variable n : nat.
 
 Implicit Types (f g : {tfps R n}).
@@ -3158,10 +3241,53 @@ Qed.
 End MoreDerivative.
 
 
+Section MapPrimExpLog.
+
+Variables (R S : unitRingType) (F : {rmorphism R -> S}) (n : nat).
+Hypothesis nat_unit : nat_unit R.
+
+Implicit Type (f : {tfps R n}).
+
+Lemma map_prim_tfps f : \int (map_tfps F f) = map_tfps F (\int f).
+Proof.
+have Sunit := rmorph_nat_unit F nat_unit.
+apply (can_in_inj (deriv_tfpsK Sunit (n := n))).
+- exact/eqP/coef0_prim_tfps.
+- by apply/eqP; rewrite coef_map_tfps coef0_prim_tfps raddf0.
+by rewrite (prim_tfpsK Sunit) -map_deriv_tfps prim_tfpsK.
+Qed.
+
+Lemma map_expt : map_tfps F expt = expt :> {tfps S n}.
+Proof.
+apply/tfpsP => i lein; rewrite coef_map_tfps.
+by rewrite !coef_tfps_of_fun lein rmorphV ?rmorph_nat // fact_unit.
+Qed.
+Lemma map_exp f :
+  f \in coeft0_eq0 ->
+  map_tfps F (exp f) = exp (map_tfps F f) :> {tfps S n}.
+Proof. by move=> f0; rewrite /exp !map_comp_tfps // map_expt. Qed.
+
+Lemma map_logt : map_tfps F logt = logt :> {tfps S n}.
+Proof.
+apply/tfpsP => i lein; rewrite coef_map_tfps !coef_tfps_of_fun lein.
+case: i {lein} => /= [|i]; first by rewrite rmorph0.
+by rewrite rmorphV ?rmorph_nat.
+Qed.
+Lemma map_log f :
+  f \in coeft0_eq1 ->
+  map_tfps F (log f) = log (map_tfps F f) :> {tfps S n}.
+Proof.
+rewrite coeft0_eq10 => f0; rewrite /log !map_comp_tfps //.
+by rewrite raddfN /= map_logt raddfB /= rmorph1.
+Qed.
+
+End MapPrimExpLog.
+
+
 Section DerivExpLog.
 
 Variables R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 
 Lemma deriv_expt n : (@expt R n.+1)^`() = expt.
 Proof.
@@ -3195,7 +3321,7 @@ Proof.
 apply/tfpsP => /= i le_in.
 rewrite coef_deriv_tfps !coef_tfps_of_fun ltnS le_in /=.
 rewrite -[LHS]mulr_natr mulrC divrr //.
-by rewrite -(scale1r \X) coef_geometrict_1cNV // expr1n.
+by rewrite -(scale1r \X) coef_geometrict_1cNXV // expr1n.
 Qed.
 
 Theorem deriv_exp n (f : {tfps R n}) :
@@ -3389,20 +3515,7 @@ Notation "\sqrt f" := (f ^^ (2%:R^-1)) : tfps_scope.
 Section CoefExpX.
 
 Variables R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
-
-Lemma coeft1cX n c : 1 + c *: \Xo(n) \in @coeft0_eq1 R n.
-Proof.
-rewrite coeft0_eq1E coeftD coeft1.
-by rewrite coeftZ coef_tfpsE val_tfpsX coefZ coefX !mulr0 addr0.
-Qed.
-
-Lemma deriv1cX n c : (1 + c *: \Xo(n.+1))^`() = c%:S :> {tfps R n}.
-Proof.
-rewrite linearD /= deriv_tfps1 add0r linearZ /=.
-rewrite -alg_tfpsC; congr (_ *: _); apply tfps_inj.
-by rewrite (val_deriv_tfps \Xo(n.+1)) val_tfpsX scale1r derivX.
-Qed.
+Hypothesis nat_unit : nat_unit R.
 
 Theorem coef_expr1cX n c a m : m <= n ->
   ((1 + c *: \Xo(n)) ^^ a)`_m = c ^+ m * \prod_(i < m) (a - i%:R) / m`!%:R :> R.
@@ -3414,7 +3527,7 @@ case: n lt_mn => [|n] //; rewrite ltnS => le_mn.
 have:= coef_deriv_tfps ((1 + c *: \Xo(n.+1)) ^^ a) m.
 rewrite -[X in _ = X -> _]mulr_natr => /(congr1 (fun x => x * m.+1%:R^-1)).
 rewrite mulrK // => <-.
-rewrite deriv_expr_tfps ?coeft1cX // deriv1cX.
+rewrite deriv_expr_tfps ?tfps1cX_in_coeft0_eq1 // deriv_tfps1cX.
 rewrite [_ * c%:S]mulrC -alg_tfpsC mulr_algl exprS coefZ.
 rewrite coefZ coef_trXn le_mn {}IHm ?(leq_trans le_mn) // {n le_mn}.
 rewrite mulrA factS natrM invrM // ?fact_unit // !mulrA; congr (_ * _ * _).
@@ -3435,7 +3548,7 @@ End CoefExpX.
 Section SquareRoot.
 
 Variables R : idomainType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 Variable n : nat.
 Implicit Types (f g : {tfps R n}).
 
@@ -3466,8 +3579,8 @@ Section TFPSField.
 Variables K : fieldType.
 Hypothesis char_K_is_zero : [pchar K] =i pred0.
 
-Lemma nat_unit_field i : i.+1%:R \is a @GRing.unit K.
-Proof. by rewrite unitfE; move: char_K_is_zero => /pcharf0P ->. Qed.
+Lemma nat_unit_field : nat_unit K.
+Proof. by move=> i; rewrite unitfE; move: char_K_is_zero => /pcharf0P ->. Qed.
 
 Local Notation nuf := nat_unit_field.
 
@@ -3517,8 +3630,6 @@ Definition expr_tfpsB         := TFPSUnitRing.expr_tfpsB         nuf.
 Definition expr_tfpsM         := TFPSUnitRing.expr_tfpsM         nuf.
 Definition sqrrK              := TFPSUnitRing.sqrrK              nuf.
 Definition sqrtK              := TFPSUnitRing.sqrtK              nuf.
-Definition coeft1cX           := TFPSUnitRing.coeft1cX.
-Definition deriv1cX           := TFPSUnitRing.deriv1cX.
 Definition coef_expr1cX       := TFPSUnitRing.coef_expr1cX       nuf.
 Definition coef_expr1X        := TFPSUnitRing.coef_expr1X        nuf.
 Definition sqrtE              := TFPSUnitRing.sqrtE              nuf.
@@ -3535,9 +3646,7 @@ Section FromRMorphism.
 Variables R : unitRingType.
 
 Fact ratr_rmorphism_nat_unit :
-  (zmod_morphism (@ratr R) /\ monoid_morphism (@ratr R))
-  <->
-    (forall i, i.+1%:R \is a @GRing.unit R).
+  (zmod_morphism (@ratr R) /\ monoid_morphism (@ratr R)) <-> (nat_unit R).
 Proof.
 split=> [[ratr_add ratr_mult] i | nat_unit].
 - have ratrAM := GRing.isZmodMorphism.Build _ _ _ ratr_add.
@@ -3574,7 +3683,7 @@ Section FromRatAlgType.
 
 Variables R : unitAlgType rat.
 
-Fact rat_algtype_nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Fact nat_unit_rat_alg : nat_unit R.
 Proof.
 rewrite -ratr_rmorphism_nat_unit.
 have eq_in_ratr := fmorph_eq_rat (in_alg R).

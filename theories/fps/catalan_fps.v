@@ -73,16 +73,16 @@ Local Open Scope fps_scope.
 Definition FC : {fps rat} := \fps (Cat i)%:R .X^i.
 
 Lemma FC_in_coef0_eq1 : FC \in coefs0_eq1.
-Proof. by rewrite coefs0_eq1E coefs_FPSeries Cat0. Qed.
+Proof. by rewrite coefs0_eq1E coef_fps Cat0. Qed.
 
 Proposition FC_algebraic_eq : FC = 1 + ''X * FC ^+ 2.
 Proof.
 rewrite /FC; apply/fpsP => i.
-rewrite !(coefs_FPSeries, coefs_simpl).
+rewrite !(coef_fps, coefs_simpl).
 case: i => [|i]; first by rewrite Cat0 addr0.
 rewrite add0r CatS /= expr2 coefsM natr_sum.
 apply eq_bigr => [[j /= _]] _.
-by rewrite !coefs_FPSeries natrM.
+by rewrite !coef_fps natrM.
 Qed.
 
 End GenSeries.
@@ -149,7 +149,7 @@ by have /pcharf0P -> := pchar_rat.
 Qed.
 
 Theorem Cat_rat i : (Cat i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
-Proof. by rewrite -coefFC coefs_FPSeries. Qed.
+Proof. by rewrite -coefFC coef_fps. Qed.
 
 Local Close Scope ring_scope.
 
@@ -197,7 +197,7 @@ apply: (lagrfix_uniq one_plusX_2_unit).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
 rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //; first last.
   rewrite coefs0_eq0E coefsB coefs1.
-  by rewrite coefs_FPSeries /= Cat0 subrr.
+  by rewrite coef_fps /= Cat0 subrr.
 by rewrite addrC subrK.
 Qed.
 
@@ -206,7 +206,7 @@ Proof.
 case: i => [|i]; first by rewrite Cat0 mul1n bin0.
 apply/eqP; rewrite -(Num.Theory.eqr_nat rat); rewrite natrM.
 have:= (congr1 (fun s => s``_i.+1) FC_fixpoint_eq).
-rewrite coefsD coefs_FPSeries.
+rewrite coefsD coef_fps.
 rewrite coefsN coefs1 subr0 /= => ->.
 rewrite (coefs_lagrfix nat_unit) ?one_plusX_2_unit //.
 rewrite -exprM mul2n addrC exprD1n coefs_sum.
@@ -279,7 +279,7 @@ Proof.
 have := congr1 (fun x => (x``_n.+1)%R) FC_differential_eq.
 rewrite coefs1 coefsD !mulrDl !mul1r !coefsD.
 rewrite -!mulNrn !(mulrnAl, coefsMn, mulNr, coefsN).
-rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coefs_FPSeries.
+rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coef_fps.
 case: n => [|n] /=; first by rewrite !Catsimpl.
 move: {n} n.+1 => n; move: (Cat n.+1) (Cat n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
