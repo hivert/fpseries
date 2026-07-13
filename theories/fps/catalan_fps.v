@@ -108,7 +108,7 @@ have: (2%:R *: ''X * FC - 1) ^+ 2 = 1 - 4%:R *: ''X.
   rewrite -{1}(mulr1 (4%:R * _)) -[X in _ + X + _]mulrA -mulrDr.
   rewrite -FC_algebraic_eq.
   by rewrite -[_ *+ 2]mulr_natl !mulrA -natrM subrr.
-move/(sqrtE nat_unit) => /(_ co1) [HeqP | HeqN].
+move/(sqrtE pchar_rat) => /(_ co1) [HeqP | HeqN].
   exfalso; move: HeqP => /(congr1 (fun x => x``_0)).
   rewrite mulr_nat coefsB -mulrA mulrC -mulrA coef_fpsXM coefs1 /=.
   rewrite (eqP (coefs0_eq1_expr _ _)) => /eqP.

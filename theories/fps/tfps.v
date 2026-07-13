@@ -2399,17 +2399,21 @@ End CompMap.
 Section CompComRing.
 
 Variables (R : comNzRingType) (n : nat).
+Implicit Types (f g : {tfps R n}) (i j : nat).
+
+Lemma coef_comp_tfpsNX f i : (f \oT (-\X))`_i = (-1) ^+ i * f`_i.
+Proof.
+have NXin : -\X \in @coeft0_eq0 R n by rewrite rpredN tfpsX_in_coeft0_eq0.
+rewrite (tfps_def f). rewrite raddf_sum /= !coeft_sum mulr_sumr.
+apply eq_bigr => /= j lejn; rewrite !linearZ !coeftZ /= mulrA.
+rewrite (comp_tfpsXn _ NXin) -scaleN1r exprZn coeftZ mulrA [f`_j * _]mulrC.
+by rewrite coef_tfpsXn andbC; case: eqP => /= [-> // | _]; rewrite !mulr0.
+Qed.
 
 Lemma comp_tfpsNXK : involutive (@comp_tfps R n (-\X)).
 Proof.
-have NXin : -\X \in @coeft0_eq0 R n by rewrite rpredN tfpsX_in_coeft0_eq0.
-move=> f; rewrite (tfps_def f) raddf_sum /=.
-under eq_bigr => /= i _.
-  by rewrite linearZ /= (comp_tfpsXn _ NXin); over.
-rewrite /= !raddf_sum /=; apply eq_bigr => i _.
-rewrite !linearZ /= -{2}scaleN1r exprZn linearZ /= scalerA.
-rewrite (comp_tfpsXn _ NXin) -scaleN1r exprZn scalerA.
-by rewrite -mulrA -exprMn mulN1r opprK expr1n mulr1.
+move=> f; apply/tfpsP => i lein; rewrite !coef_comp_tfpsNX mulrA.
+by rewrite -expr2 sqrr_sign mul1r.
 Qed.
 
 End CompComRing.

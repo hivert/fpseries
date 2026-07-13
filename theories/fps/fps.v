@@ -1630,32 +1630,6 @@ End Primitive.
 Notation "\int p" := (prim_fps p) (at level 10) : fps_scope.
 
 
-Section PrimitiveUnitRing.
-
-Variable R : unitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
-Implicit Types (f g : {fps R}).
-
-Lemma prim_fpsK : cancel (@prim_fps R) (@deriv_fps R).
-Proof.
-move=> p; apply/fpsP => n.
-rewrite coef_deriv_fps coef_prim_fps /=.
-by rewrite -[LHS]mulr_natr divrK.
-Qed.
-
-Lemma deriv_tfpsK :
-  {in coefs0_eq0, cancel (@deriv_fps R) (@prim_fps R)}.
-Proof.
-move=> f; rewrite coefs0_eq0E => /eqP f0_eq0.
-apply/fpsP => i.
-rewrite coef_prim_fps coef_deriv_fps.
-case: i => [|i] /=; first by rewrite f0_eq0.
-by rewrite -[X in X / _ = _]mulr_natr mulrK.
-Qed.
-
-End PrimitiveUnitRing.
-
-
 Section Composition.
 
 Variables (R : nzSemiRingType).
@@ -1776,6 +1750,26 @@ by rewrite !(proj_map_fps, proj_comp_fps) map_comp_tfps.
 Qed.
 
 End CompMap.
+
+
+Section CompComRing.
+
+Variables (R : comNzRingType).
+Implicit Types (f g : {fps R}) (i j : nat).
+
+Lemma coef_comp_fpsNX f i : (f \oS (-''X))``_i = (-1) ^+ i * f``_i.
+Proof.
+rewrite -!(coeft_proj (leqnn i)) proj_comp_fps projN proj_fpsX.
+by rewrite coef_comp_tfpsNX.
+Qed.
+
+Lemma comp_fpsNXK : involutive (@comp_fps R (-''X)).
+Proof.
+move=> f; apply/fpsP => i; rewrite !coef_comp_fpsNX mulrA.
+by rewrite -expr2 sqrr_sign mul1r.
+Qed.
+
+End CompComRing.
 
 
 Section CompUnitRing.
@@ -1988,7 +1982,7 @@ End Lagrange.
 Section LagrangeTheorem.
 
 Variables R : comUnitRingType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 Implicit Type (f g : {fps R}).
 
 Theorem Lagrange_Bürmann_exp g i k :
@@ -2157,6 +2151,34 @@ Notation "f ^^ r" := (expr_fps r f) : fps_scope.
 Notation "\sqrt f" := (f ^^ (2%:R^-1)) : fps_scope.
 
 
+Module FPSUnitRing.
+
+Section PrimitiveUnitRing.
+
+Variable R : unitRingType.
+Hypothesis nat_unit : nat_unit R.
+Implicit Types (f g : {fps R}).
+
+Lemma prim_fpsK : cancel (@prim_fps R) (@deriv_fps R).
+Proof.
+move=> p; apply/fpsP => n.
+rewrite coef_deriv_fps coef_prim_fps /=.
+by rewrite -[LHS]mulr_natr divrK.
+Qed.
+
+Lemma deriv_fpsK :
+  {in coefs0_eq0, cancel (@deriv_fps R) (@prim_fps R)}.
+Proof.
+move=> f; rewrite coefs0_eq0E => /eqP f0_eq0.
+apply/fpsP => i.
+rewrite coef_prim_fps coef_deriv_fps.
+case: i => [|i] /=; first by rewrite f0_eq0.
+by rewrite -[X in X / _ = _]mulr_natr mulrK.
+Qed.
+
+End PrimitiveUnitRing.
+
+
 Import TFPSUnitRing.
 
 Section ExpMorph.
@@ -2179,6 +2201,15 @@ Qed.
 
 Lemma expB : {in @coefs0_eq0 R &, {morph exp : f g / f - g >-> f / g}}.
 Proof. by move=> f g hf hg; rewrite expD ?rpredN // expN. Qed.
+
+Lemma exp_sum (I : eqType) (r : seq I) (P : pred I) (F : I -> {fps R}) :
+  (forall i, P i -> F i \in coefs0_eq0) ->
+  exp (\sum_(i <- r | P i) F i) = \prod_(i <- r | P i) exp (F i).
+Proof.
+move=> H; apply (big_morph_in (@coefs0_eq0D R)
+                   (zero_in_coefs0_eq0 R) expD (exp0 R)).
+by apply/allP => /= f /mapP[i]; rewrite mem_filter => /andP[/H Fiin _ ->].
+Qed.
 
 End ExpMorph.
 
@@ -2230,6 +2261,46 @@ Qed.
 End MoreDerivative.
 
 Open Scope fps_scope.
+
+
+Section MapPrimExpLog.
+
+Variables (R S : unitRingType) (F : {rmorphism R -> S}).
+Hypothesis nat_unit : nat_unit R.
+
+Implicit Type (f : {fps R}).
+
+Lemma map_prim_fps f : \int (map_fps F f) = map_fps F (\int f).
+Proof.
+apply/invlimE => /= [[|i]].
+  by rewrite proj_map_fps !proj0_prim_fps raddf0.
+by rewrite proj_map_fps !projS_prim_fps -map_prim_tfps // proj_map_fps.
+Qed.
+Lemma map_exps : map_fps F exps = exps :> {fps S}.
+Proof.
+apply/fpsP => i; rewrite coef_map_fps.
+by rewrite !coef_fps rmorphV ?rmorph_nat // fact_unit.
+Qed.
+Lemma map_exp f :
+  f \in coefs0_eq0 ->
+  map_fps F (exp f) = exp (map_fps F f) :> {fps S}.
+Proof. by move=> f0; rewrite /exp !map_comp_fps // map_exps. Qed.
+
+Lemma map_logt : map_fps F logs = logs :> {fps S}.
+Proof.
+apply/fpsP => i; rewrite coef_map_fps !coef_fps.
+case: i => /= [|i]; first by rewrite rmorph0.
+by rewrite rmorphV ?rmorph_nat.
+Qed.
+Lemma map_log f :
+  f \in coefs0_eq1 ->
+  map_fps F (log f) = log (map_fps F f) :> {fps S}.
+Proof.
+rewrite coefs0_eq10 => f0; rewrite /log !map_comp_fps //.
+by rewrite raddfN /= map_logt raddfB /= rmorph1.
+Qed.
+
+End MapPrimExpLog.
 
 
 Section DerivExpLog.
@@ -2323,6 +2394,14 @@ Qed.
 Lemma log_div : {in @coefs0_eq1 R &, {morph log : f g / f / g >-> f - g}}.
 Proof. by move=> f g f0_eq1 g0_eq1 /=; rewrite logM ?rpredV // logV. Qed.
 
+Lemma log_prod (I : eqType) (r : seq I) (P : pred I) (F : I -> {fps R}) :
+  (forall i, P i -> F i \in coefs0_eq1) ->
+  log (\prod_(i <- r | P i) F i) = \sum_(i <- r | P i) log (F i).
+Proof.
+pose mulcl := mulr_closed_coefs0_eq1 R.
+move=> H; apply: (big_morph_in mulcl.2 mulcl.1 logM (log1 _)).
+by apply/allP => /= f /mapP[i]; rewrite mem_filter => /andP[/H Fiin _ ->].
+Qed.
 
 Section ExprFPS.
 
@@ -2405,6 +2484,8 @@ Qed.
 
 End DerivExpLog.
 
+Notation "\sqrt f" := (f ^^ (2%:R^-1)) : fps_scope.
+
 
 Section CoefExpX.
 
@@ -2439,7 +2520,7 @@ Open Scope fps_scope.
 Section SquareRoot.
 
 Variables R : idomainType.
-Hypothesis nat_unit : forall i, i.+1%:R \is a @GRing.unit R.
+Hypothesis nat_unit : nat_unit R.
 Implicit Types (f g : {fps R}).
 
 (* Lifting from TFPS is more complicated than re-doing the computation *)
@@ -2456,3 +2537,58 @@ rewrite mulf_eq0 => /orP [].
 Qed.
 
 End SquareRoot.
+
+End FPSUnitRing.
+
+
+Module FPSField.
+Section FPSField.
+
+Variables K : fieldType.
+Hypothesis char_K_is_zero : [pchar K] =i pred0.
+
+Local Notation nuf := (nat_unit_field char_K_is_zero).
+
+Definition prim_fpsK          := FPSUnitRing.prim_fpsK         nuf.
+Definition deriv_fpsK         := FPSUnitRing.deriv_fpsK        nuf.
+Definition derivXn_fps        := FPSUnitRing.derivXn_fps.
+Definition expD               := FPSUnitRing.expD               nuf.
+Definition expN               := FPSUnitRing.expN               nuf.
+Definition expB               := FPSUnitRing.expB               nuf.
+Definition exp_sum            := FPSUnitRing.exp_sum            nuf.
+Definition deriv_fps_eq0_cst  := FPSUnitRing.deriv_fps_eq0_cst  nuf.
+Definition deriv_fps_eq0      := FPSUnitRing.deriv_fps_eq0      nuf.
+Definition deriv_fps_eq       := FPSUnitRing.deriv_fps_eq       nuf.
+Definition deriv_exp          := FPSUnitRing.deriv_exp          nuf.
+Definition deriv_exps         := FPSUnitRing.deriv_exps         nuf.
+Definition deriv_expE         := FPSUnitRing.deriv_expE         nuf.
+Definition deriv_expsE        := FPSUnitRing.deriv_expsE        nuf.
+Definition deriv_log          := FPSUnitRing.deriv_log          nuf.
+Definition deriv_logs         := FPSUnitRing.deriv_logs         nuf.
+Definition expK               := FPSUnitRing.expK               nuf.
+Definition exp_inj            := FPSUnitRing.exp_inj            nuf.
+Definition logK               := FPSUnitRing.logK               nuf.
+Definition log_inj            := FPSUnitRing.log_inj            nuf.
+Definition logM               := FPSUnitRing.logM               nuf.
+Definition logV               := FPSUnitRing.logV               nuf.
+Definition log_div            := FPSUnitRing.log_div            nuf.
+Definition log_prod           := FPSUnitRing.log_prod           nuf.
+Definition coefs0_eq1_expr    := FPSUnitRing.coefs0_eq1_expr.
+Definition expr_fpsn          := FPSUnitRing.expr_fpsn          nuf.
+Definition expr_fps0          := FPSUnitRing.expr_fps0.
+Definition expr_fps1          := FPSUnitRing.expr_fps1          nuf.
+Definition expr_fpsN          := FPSUnitRing.expr_fpsN          nuf.
+Definition expr_fpsN1         := FPSUnitRing.expr_fpsN1         nuf.
+Definition expr_fpsNn         := FPSUnitRing.expr_fpsNn         nuf.
+Definition expr_fpsD          := FPSUnitRing.expr_fpsD          nuf.
+Definition expr_fpsB          := FPSUnitRing.expr_fpsB          nuf.
+Definition expr_fpsM          := FPSUnitRing.expr_fpsM          nuf.
+Definition sqrrK              := FPSUnitRing.sqrrK              nuf.
+Definition sqrtK              := FPSUnitRing.sqrtK              nuf.
+Definition coef_expr1cX       := FPSUnitRing.coef_expr1cX       nuf.
+Definition coef_expr1X        := FPSUnitRing.coef_expr1X        nuf.
+Definition sqrtE              := FPSUnitRing.sqrtE              nuf.
+
+End FPSField.
+End FPSField.
+Export FPSField.
