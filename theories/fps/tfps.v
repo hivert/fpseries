@@ -2920,7 +2920,7 @@ rewrite (tfps_def h) !(raddf_sum, mulr_suml, mulr_sumr, coeft_sum) /=.
 apply eq_bigr => [[k /=]]; rewrite ltnS => le_kn2 _.
 rewrite !linearZ /= -mulrA mulrC -!scalerAl !coeftZ; congr (_ * _).
 rewrite rmorphXn /= comp_tfpsX ?coeft0_eq0_trXnt ?coeft0_eq0_lagrfix //.
-rewrite -rmorphXn coef_trXnt le_in1.
+rewrite -[in LHS]rmorphXn coef_trXnt le_in1.
 case: (leqP k i) => [le_ki | lt_ik]; first last.
   rewrite coefX_tfps_eq0 ?coeft0_eq0_lagrfix //.
   by rewrite -mulrA coef_tfpsXnM lt_ik.
