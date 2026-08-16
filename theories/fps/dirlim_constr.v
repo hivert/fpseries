@@ -103,7 +103,7 @@ From mathcomp Require Import all_boot order ssralg.
 
 Require Import natbar directed.
 
-Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Import GRing.Theory.
 Import Order.Syntax.
@@ -115,10 +115,12 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Reserved Notation "{ 'dirlim' S }" (at level 0, format "{ 'dirlim'  S }").
-Reserved Notation "''inj_' i" (at level 0, i at level 2, format "''inj_' i").
-Reserved Notation "''inj[' T ']'" (at level 0).
-Reserved Notation "''inj[' T ']_' i" (at level 0, i at level 2).
-Reserved Notation "''ind[' T ']'" (at level 0).
+Reserved Notation "''inj_' i" (at level 1, i at level 2, format "''inj_' i").
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''inj[' T ']'" (at level 1).
+Reserved Notation "''inj[' T ']_' i" (at level 1, i at level 2).
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''ind[' T ']'" (at level 1).
 
 
 

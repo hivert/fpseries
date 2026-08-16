@@ -112,7 +112,7 @@ From mathcomp Require Import boolp classical_sets.
 
 Require Import natbar directed.
 
-Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Import GRing.Theory.
 Import Order.Syntax.
@@ -126,7 +126,8 @@ Reserved Notation "{ 'invlim' S }"
          (at level 0, format "{ 'invlim'  S }").
 Reserved Notation "''pi_' i" (at level 8, i at level 2, format "''pi_' i").
 Reserved Notation "''pi[' T ']_' i" (at level 8, i at level 2).
-Reserved Notation "''ind[' T ']'" (at level 0).
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''ind[' T ']'" (at level 1).
 
 Reserved Notation "\Sum_( i : t ) F"
          (at level 41, F at level 41, i at level 50,

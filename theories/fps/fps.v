@@ -108,7 +108,7 @@ From mathcomp Require Import boolp classical_sets.
 
 Require Import auxresults natbar directed tfps invlim.
 
-Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -127,8 +127,8 @@ Local Open Scope fps_scope.
 Reserved Notation "{ 'fps' R }"
          (at level 0, R at level 2, format "{ 'fps'  R }").
 Reserved Notation "c %:S" (at level 1, format "c %:S").
-Reserved Notation "\fps E .X^ i"
-  (at level 36, E at level 36, i at level 50, format "\fps  E  .X^ i").
+Reserved Notation "\fps E '.X^' i"
+  (at level 36, E at level 35, i at level 50, format "\fps  E  '.X^' i").
 Reserved Notation "''X" (at level 0).
 Reserved Notation "a ^`` ()" (at level 1, format "a ^`` ()").
 Reserved Notation "s ``_ i" (at level 3, i at level 2, left associativity,
@@ -610,7 +610,7 @@ Variable R : nzSemiRingType.
 
 Implicit Types (a b c : R) (f g : {fps R}) (i j : nat).
 
-Definition hmul_fps f g := \fps f``_i * g``_i .X^i.
+Definition hmul_fps f g := \fps (f``_i * g``_i) .X^i.
 Local Notation "f *h g" := (hmul_fps f g) (at level 2).
 
 Lemma hmul_fpsA : associative hmul_fps.
@@ -1422,7 +1422,7 @@ Section Derivative.
 Variables (R : nzSemiRingType).
 Implicit Types (f g : {fps R}).
 
-Definition deriv_fps f : {fps R} := \fps f``_j.+1 *+ j.+1 .X^j.
+Definition deriv_fps f : {fps R} := \fps (f``_j.+1 *+ j.+1) .X^j.
 Local Notation "f ^` () " := (deriv_fps f).
 
 Lemma coef_deriv_fps f j : (f^`()%fps)``_j = f``_j.+1 *+ j.+1.
@@ -1584,7 +1584,7 @@ Section Primitive.
 Variables (R : unitRingType).
 
 Definition prim_fps f : {fps R} :=
-  \fps f``_j.-1 *+ (j != 0%N) / (j%:R) .X^j.
+  \fps (f``_j.-1 *+ (j != 0%N) / (j%:R)) .X^j.
 Local Notation "\int p" := (prim_fps p) (at level 10) : fps_scope.
 
 Lemma coef_prim_fps f j :
@@ -2319,7 +2319,7 @@ Lemma deriv_expE a f :
 Proof.
 move=> devf; apply/invlimE => [][|i].
   by rewrite projZ !proj0CE coefs0_exp tfpsC1 alg_tfpsC.
-rewrite (deriv_expE nat_unit (f := 'pi_i.+1 f) (a := a)); first last.
+rewrite (deriv_expE nat_unit (f := 'pi_i.+1 f) (a := a)).
   have:= congr1 'pi[{fps R}]_i devf.
   by rewrite -!fps_bondE !ilprojE proj_deriv_fps projZ.
 by rewrite !proj_simpl coeft_proj // proj_exp proj_simpl proj_fpsX.
