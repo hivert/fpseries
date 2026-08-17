@@ -357,7 +357,7 @@ Proof. by apply/fpsP => j; rewrite coef_fps. Qed.
 
 Definition coefs_head h i (s : {fps R}) :=
   let: tt := h in coef_series s i.
-Local Notation coefs i := (coefs_head tt i).
+Local Abbreviation coefs i := (coefs_head tt i).
 
 Fact coefs_is_nmod_morphism i : nmod_morphism (coefs i).
 Proof.
@@ -648,7 +648,7 @@ Variable R : nzRingType.
 
 Implicit Types (a b c : R) (s t u : {fps R}) (p q : {poly R}) (i j : nat).
 
-Local Notation coefs i := (coefs_head tt i).
+Local Abbreviation coefs i := (coefs_head tt i).
 
 Lemma coefsN s i : (- s)``_i = - (s``_i).
 Proof. exact: (raddfN (coefs i)). Qed.
@@ -1177,8 +1177,8 @@ Section Coefficient01Ring.
 Variables (R : nzRingType).
 Implicit Types (f g : {fps R}).
 
-Local Notation coefs0_eq0 := (@coefs0_eq0 R).
-Local Notation coefs0_eq1 := (@coefs0_eq1 R).
+Local Abbreviation coefs0_eq0 := (@coefs0_eq0 R).
+Local Abbreviation coefs0_eq1 := (@coefs0_eq1 R).
 
 Fact coefs0_eq0_idealr : idealr_closed coefs0_eq0.
 Proof.
@@ -2547,7 +2547,7 @@ Section FPSField.
 Variables K : fieldType.
 Hypothesis char_K_is_zero : [pchar K] =i pred0.
 
-Local Notation nuf := (nat_unit_field char_K_is_zero).
+Local Abbreviation nuf := (nat_unit_field char_K_is_zero).
 
 Definition prim_fpsK          := FPSUnitRing.prim_fpsK         nuf.
 Definition deriv_fpsK         := FPSUnitRing.deriv_fpsK        nuf.
