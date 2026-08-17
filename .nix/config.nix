@@ -64,17 +64,6 @@
         mathcomp.override.version = "2.5.0";
       };
     };
-    "rocq-9.2-mc2.5.0" = {
-      rocqPackages = {
-        rocq-core.override.version = "9.2";
-        mathcomp.override.version = "2.5.0";
-        mathcomp.job = false;
-      };
-      coqPackages = {
-        coq.override.version = "9.2";
-        mathcomp.override.version = "2.5.0";
-      };
-    };
     "rocq-9.2-mc2.6.0" = {
       rocqPackages = {
         rocq-core.override.version = "9.2";
