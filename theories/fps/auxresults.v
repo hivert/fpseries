@@ -3,6 +3,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype.
 From mathcomp Require Import div tuple bigop ssralg poly polydiv.
 
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
@@ -65,17 +67,10 @@ move=> le_m2m1; have [ltn_m1n|geq_m1n] := ltnP m1 n; last first.
   rewrite big_geq // big_nat_cond big_pred0 // => i.
   by apply/negP => /and3P[/andP [_ /leq_trans]]; rewrite leqNgt => ->.
 rewrite [RHS](@big_cat_nat _ _ _ m1) // 1?ltnW //.
-rewrite [X in op X]big_nat_cond [X in op X]big_pred0; last first.
+rewrite [X in op X]big_nat_cond [X in op X]big_pred0.
   by move=> i; have [] := ltnP i m1; rewrite ?(andbT, andbF).
 rewrite Monoid.mul1m [LHS]big_nat_cond [RHS]big_nat_cond.
 by apply/eq_bigl => i; have [] := ltnP i m1; rewrite ?(andbT, andbF).
-Qed.
-
-Lemma big_mknat  (op : Monoid.law idx)  (a b : nat) (F : nat -> R) :
-  \big[op/idx]_(i < b | a <= i) F i = \big[op/idx]_(a <= i < b) F i.
-Proof.
-rewrite -(big_mkord (fun i => a <= i) F).
-by rewrite -(big_nat_widen_l _ _ predT) ?leq0n.
 Qed.
 
 End MoreBigop.
@@ -90,7 +85,7 @@ Lemma coefMD_wid (R : nzSemiRingType) (p q : {poly R}) (m n i : nat) :
 Proof.
 move=> m_big n_big; rewrite pair_big_dep.
 pose tom := widen_ord m_big; pose ton := widen_ord n_big.
-rewrite (reindex (fun j : 'I_i.+1 => (tom j, ton (rev_ord j)))) /=.
+rewrite (reindex (fun j : 'I_i.+1 => (tom j, ton (rev_ord j)))) /=; first last.
   rewrite coefM; apply: eq_big => //= j.
   by rewrite -maxnE (maxn_idPr _) ?eqxx ?leq_ord.
 exists (fun k : 'I__ * 'I__ => insubd ord0 k.1) => /=.
@@ -106,7 +101,7 @@ Lemma coefMD (R : nzSemiRingType) (p q : {poly R}) (i : nat) :
 Proof.
 rewrite (@coefMD_wid _ _ _ i.+1 i.+1) //=.
 rewrite (bigID (fun j1 :'I__ => j1 < size p)) /=.
-rewrite [X in _ + X]big1 ?addr0; last first.
+rewrite [X in _ + X]big1 ?addr0.
   move=> j1; rewrite -ltnNge => j1_big.
   by rewrite big1 // => j2 _; rewrite nth_default ?mul0r.
 rewrite (big_ord_exchange
@@ -116,7 +111,7 @@ have [j1_small|j1_big] := leqP; last first.
   rewrite big1 // => j2; rewrite eq_sym => /eqP i_def.
   by rewrite i_def -ltn_subRL subnn ltn0 in j1_big.
 rewrite (bigID (fun j2 :'I__ => j2 < size q)) /=.
-rewrite [X in _ + X]big1 ?addr0; last first.
+rewrite [X in _ + X]big1 ?addr0.
   move=> j2; rewrite -ltnNge => /andP[_ j2_big].
   by rewrite [q`__]nth_default ?mulr0.
 rewrite (big_ord_exchange_cond
@@ -174,7 +169,7 @@ Lemma eq_divf_mul (a b c d : K) : a / b != 0 -> a / b = c / d -> a * d = c * b.
 Proof.
 have [->| d_neq0 ab0 /eqP] := eqVneq d 0.
   by rewrite !invr0 !mulr0 => /negPf ab0 /eqP; rewrite ab0.
-rewrite eq_divf //; first by move/eqP.
+rewrite eq_divf //; last by move/eqP.
 by apply: contraNneq ab0 => ->; rewrite invr0 mulr0.
 Qed.
 

@@ -1,15 +1,18 @@
 (** Inverse limits *)
 (******************************************************************************)
-(*       Copyright (C) 2019-2021 Florent Hivert <florent.hivert@lri.fr>       *)
+(*    Copyright (C) 2019-2026 Florent Hivert <florent.hivert@lisn.fr>         *)
 (*                                                                            *)
-(*  Distributed under the terms of the GNU General Public License (GPL)       *)
+(*    This program is free software; you can redistribute it and/or           *)
+(*    modify it under the terms of the GNU Lesser General Public              *)
+(*    License as published by the Free Software Foundation; either            *)
+(*    version 3 of the License, or (at your option) any later version.        *)
 (*                                                                            *)
 (*    This code is distributed in the hope that it will be useful,            *)
 (*    but WITHOUT ANY WARRANTY; without even the implied warranty of          *)
 (*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU       *)
 (*    General Public License for more details.                                *)
 (*                                                                            *)
-(*  The full text of the GPL is available at:                                 *)
+(*    The full text of the LGPL is available at:                              *)
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
@@ -109,6 +112,7 @@ From mathcomp Require Import boolp classical_sets.
 
 Require Import natbar directed.
 
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Import GRing.Theory.
 Import Order.Syntax.
@@ -122,7 +126,8 @@ Reserved Notation "{ 'invlim' S }"
          (at level 0, format "{ 'invlim'  S }").
 Reserved Notation "''pi_' i" (at level 8, i at level 2, format "''pi_' i").
 Reserved Notation "''pi[' T ']_' i" (at level 8, i at level 2).
-Reserved Notation "''ind[' T ']'" (at level 0).
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''ind[' T ']'" (at level 1).
 
 Reserved Notation "\Sum_( i : t ) F"
          (at level 41, F at level 41, i at level 50,
@@ -696,7 +701,7 @@ HB.structure Definition LmoduleInvLim
 
 #[short(type="lSemiAlgInvLimType")]
 HB.structure Definition LSemiAlgebraInvLim
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -709,7 +714,7 @@ HB.structure Definition LSemiAlgebraInvLim
 
 Section LSemiAlgInvLimTheory.
 
-Variable (R : pzSemiRingType).
+Variable (R : nzSemiRingType).
 Variables (disp : _) (I : porderType disp).
 Variable Obj : I -> lSemiAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
@@ -735,7 +740,7 @@ End LSemiAlgInvLimTheory.
 
 #[short(type="lalgInvLimType")]
 HB.structure Definition LalgebraInvLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -749,7 +754,7 @@ HB.structure Definition LalgebraInvLim
 
 #[short(type="semiAlgInvLimType")]
 HB.structure Definition SemiAlgebraInvLim
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -762,7 +767,7 @@ HB.structure Definition SemiAlgebraInvLim
 
 #[short(type="algInvLimType")]
 HB.structure Definition AlgebraInvLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -775,7 +780,7 @@ HB.structure Definition AlgebraInvLim
 
 #[short(type="comSemiAlgInvLimType")]
 HB.structure Definition ComSemiAlgebraInvLim
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> comSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -788,7 +793,7 @@ HB.structure Definition ComSemiAlgebraInvLim
 
 #[short(type="comAlgInvLimType")]
 HB.structure Definition ComAlgebraInvLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> comAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1337,14 +1342,14 @@ HB.end.
 
 
 HB.factory Record InvLim_isLSemiAlgebraInvLim
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   ilT of InvLim _ Sys ilT := {}.
 HB.builders Context
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1369,14 +1374,14 @@ HB.end.
 
 
 HB.factory Record InvLim_isLalgebraInvLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   ilT of InvLim _ Sys ilT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1394,14 +1399,14 @@ HB.end.
 
 
 HB.factory Record InvLim_isSemiAlgebraInvLim
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   ilT of InvLim _ Sys ilT := {}.
 HB.builders Context
-    (R : pzSemiRingType)
+    (R : nzSemiRingType)
     disp (I : porderType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1424,14 +1429,14 @@ HB.end.
 
 
 HB.factory Record InvLim_isAlgebraInvLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
     (Sys : is_invsys bonding)
   ilT of InvLim _ Sys ilT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : porderType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i})
@@ -1658,7 +1663,7 @@ Let test : lmodInvLimType _ := {invlim Sys}.
 End LModule.
 
 Section LSemiAlgebra.
-Variables (R : pzSemiRingType).
+Variables (R : nzSemiRingType).
 Variable Obj : I -> lSemiAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
@@ -1668,7 +1673,7 @@ Let test : lSemiAlgInvLimType _ := {invlim Sys}.
 End LSemiAlgebra.
 
 Section LAlgebra.
-Variables (R : pzRingType).
+Variables (R : nzRingType).
 Variable Obj : I -> lalgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
@@ -1678,7 +1683,7 @@ Let test : lalgInvLimType _ := {invlim Sys}.
 End LAlgebra.
 
 Section SemiAlgebra.
-Variables (R : pzSemiRingType).
+Variables (R : nzSemiRingType).
 Variable Obj : I -> semiAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
@@ -1688,7 +1693,7 @@ Let test : semiAlgInvLimType _ := {invlim Sys}.
 End SemiAlgebra.
 
 Section Algebra.
-Variables (R : pzRingType).
+Variables (R : nzRingType).
 Variable Obj : I -> algType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
@@ -1698,7 +1703,7 @@ Let test : algInvLimType _ := {invlim Sys}.
 End Algebra.
 
 Section ComSemiAlgebra.
-Variables (R : pzSemiRingType).
+Variables (R : nzSemiRingType).
 Variable Obj : I -> comSemiAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.
@@ -1707,7 +1712,7 @@ Let test : comSemiAlgInvLimType _ := {invlim Sys}.
 End ComSemiAlgebra.
 
 Section ComAlgebra.
-Variables (R : pzRingType).
+Variables (R : nzRingType).
 Variable Obj : I -> comAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj j -> Obj i}.
 Variable Sys : is_invsys bonding.

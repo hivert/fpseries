@@ -1,15 +1,18 @@
 (** * Combi.padic : padic integer *)
 (******************************************************************************)
-(*       Copyright (C) 2019-2021 Florent Hivert <florent.hivert@lri.fr>       *)
+(*    Copyright (C) 2019-2026 Florent Hivert <florent.hivert@lisn.fr>         *)
 (*                                                                            *)
-(*  Distributed under the terms of the GNU General Public License (GPL)       *)
+(*    This program is free software; you can redistribute it and/or           *)
+(*    modify it under the terms of the GNU Lesser General Public              *)
+(*    License as published by the Free Software Foundation; either            *)
+(*    version 3 of the License, or (at your option) any later version.        *)
 (*                                                                            *)
 (*    This code is distributed in the hope that it will be useful,            *)
 (*    but WITHOUT ANY WARRANTY; without even the implied warranty of          *)
 (*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU       *)
 (*    General Public License for more details.                                *)
 (*                                                                            *)
-(*  The full text of the GPL is available at:                                 *)
+(*    The full text of the LGPL is available at:                              *)
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
@@ -45,6 +48,8 @@ From mathcomp Require Import order.
 
 Require Import natbar directed invlim.
 
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
@@ -64,8 +69,8 @@ Proof.
 move=> Hd; rewrite (modn_def n d); case: (edivnP n d) => q r ->.
 rewrite Hd /= => rled ddivm Hqr.
 rewrite subnDA; apply/eqP. rewrite -(eqn_modDr r); apply/eqP.
-rewrite [in RHS]subnK ?modnn; last exact: ltnW.
-rewrite subnK; first last.
+rewrite [in RHS]subnK ?modnn; first exact: ltnW.
+rewrite subnK.
   by rewrite -(leq_add2l (q * d)) subnKC // (leq_trans _ Hqr) // leq_addr.
 move: ddivm => /dvdnP [k ->{m Hqr}].
 by rewrite -mulnBl modnMl.
@@ -232,9 +237,9 @@ rewrite !rmorphM rmorph_nat /=.
 have lei_in : (i <= (i + n)%N)%O by rewrite leEnat leq_addr.
 rewrite -(ilprojE x lei_in) /= /padic_bond /Zmn; apply val_inj => /=.
 move: (val ('pi_(i + n)%N x)) => {}x.
-rewrite val_Zp_nat // [(p ^ n %% _)%N]modn_small; first last.
+rewrite val_Zp_nat // [(p ^ n %% _)%N]modn_small.
   by rewrite ltn_exp2l // ltnS leq_addl.
-rewrite !ZpX_cast // -addSn divn_modl; last exact/dvdnX/leq_addl.
+rewrite !ZpX_cast // -addSn divn_modl; first exact/dvdnX/leq_addl.
 by rewrite mulKn // expnD mulnK // modn_mod.
 Qed.
 

@@ -1,15 +1,18 @@
 (** Combi.catalan : Catalan numbers (truncated version) *)
 (******************************************************************************)
-(*       Copyright (C) 2019 Florent Hivert <florent.hivert@lri.fr>            *)
+(*    Copyright (C) 2019-2026 Florent Hivert <florent.hivert@lisn.fr>         *)
 (*                                                                            *)
-(*  Distributed under the terms of the GNU General Public License (GPL)       *)
+(*    This program is free software; you can redistribute it and/or           *)
+(*    modify it under the terms of the GNU Lesser General Public              *)
+(*    License as published by the Free Software Foundation; either            *)
+(*    version 3 of the License, or (at your option) any later version.        *)
 (*                                                                            *)
 (*    This code is distributed in the hope that it will be useful,            *)
 (*    but WITHOUT ANY WARRANTY; without even the implied warranty of          *)
 (*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU       *)
 (*    General Public License for more details.                                *)
 (*                                                                            *)
-(*  The full text of the GPL is available at:                                 *)
+(*    The full text of the LGPL is available at:                              *)
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
@@ -32,6 +35,7 @@ From mathcomp Require Import fintype div bigop ssralg poly binomial rat ssrnum.
 
 Require Import tfps auxresults.
 
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -41,17 +45,18 @@ Unset Printing Implicit Defensive.
 (** ** The generating series of Catalan numbers *)
 Section Catalan.
 
-Variable (C : nat -> nat).
+Variable (Cat : nat -> nat).
 
-Hypothesis C0 : C 0 = 1%N.
-Hypothesis CS : forall n : nat, C n.+1 = \sum_(i < n.+1) C i * C (n - i).
+Hypothesis Cat0 : Cat 0 = 1%N.
+Hypothesis CatS :
+  forall n : nat, Cat n.+1 = \sum_(i < n.+1) Cat i * Cat (n - i).
 
-Local Definition Csimpl := (C0, CS, big_ord0, big_ord_recl).
-Example C1 : C 1 = 1.  Proof. by rewrite !Csimpl. Qed.
-Example C2 : C 2 = 2.  Proof. by rewrite !Csimpl. Qed.
-Example C3 : C 3 = 5.  Proof. by rewrite !Csimpl. Qed.
-Example C4 : C 4 = 14. Proof. by rewrite !Csimpl. Qed.
-Example C5 : C 5 = 42. Proof. by rewrite !Csimpl. Qed.
+Local Definition Catsimpl := (Cat0, CatS, big_ord0, big_ord_recl).
+Example Cat1 : Cat 1 = 1.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat2 : Cat 2 = 2.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat3 : Cat 3 = 5.  Proof. by rewrite !Catsimpl. Qed.
+Example Cat4 : Cat 4 = 14. Proof. by rewrite !Catsimpl. Qed.
+Example Cat5 : Cat 5 = 42. Proof. by rewrite !Catsimpl. Qed.
 
 Import GRing.Theory.
 
@@ -66,17 +71,17 @@ Local Open Scope ring_scope.
 Local Open Scope tfps_scope.
 
 Variable n : nat.
-Definition FC : {tfps rat n} := [tfps i => (C i)%:R].
+Definition FC : {tfps rat n} := [tfps i => (Cat i)%:R].
 
 Lemma FC_in_coef0_eq1 : FC \in coeft0_eq1.
-Proof. by rewrite coeft0_eq1E coef_tfps_of_fun C0. Qed.
+Proof. by rewrite coeft0_eq1E coef_tfps_of_fun Cat0. Qed.
 
 Proposition FC_algebraic_eq : FC = 1 + \X * FC ^+ 2.
 Proof.
 rewrite /FC; apply/tfpsP => i le_in.
 rewrite coef_tfps_of_fun coefD coef1 coef_tfpsXM le_in.
-case: i le_in => [|i] lt_in; first by rewrite C0 addr0.
-rewrite add0r CS /= expr2 coef_trXn (ltnW lt_in) coefM natr_sum.
+case: i le_in => [|i] lt_in; first by rewrite Cat0 addr0.
+rewrite add0r CatS /= expr2 coef_trXn (ltnW lt_in) coefM natr_sum.
 apply eq_bigr => [[j]]; rewrite /= ltnS => le_ji _.
 rewrite natrM !coef_poly.
 rewrite (leq_trans (leq_ltn_trans le_ji lt_in) (leqnSn _)).
@@ -131,7 +136,7 @@ have -> : (1 *- 2)^+ i.+1 = \prod_(i0 < i.+1) (1 *- 2) :> rat.
 rewrite -big_split /= big_ord_recl /=.
 rewrite subr0 mulNr divrr // mulN1r 2!mulrN [LHS]opprK.
 rewrite exprS !mulrA [2%:R^-1 * 2%:R]mulVf // mul1r.
-rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=; last first.
+rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=.
   move=> j _; rewrite /bump /=.
   rewrite mulNr -mulrN opprD addrC opprK addnC natrD 2!mulrDr.
   rewrite mulrN divff // mulr1 -{2}addn1 {2}natrD addrA addrK.
@@ -147,12 +152,12 @@ rewrite -mulnDr addn1 natrM mulfK //.
 by have /pcharf0P -> := pchar_rat.
 Qed.
 
-Theorem Cat_rat i : (C i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
+Theorem Cat_rat i : (Cat i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
 Proof. by rewrite -(coefFC (ltnSn i)) coef_tfps_of_fun (ltnW _). Qed.
 
 Local Close Scope ring_scope.
 
-Theorem CatM i : C i * i`! * i.+1`! = i.*2`!.
+Theorem CatM i : Cat i * i`! * i.+1`! = i.*2`!.
 Proof.
 have:= Cat_rat i.
 move/(congr1 (fun x => x * (i.+1)`!%:R * i`!%:R)%R).
@@ -161,16 +166,16 @@ rewrite Num.Theory.eqr_nat => /eqP <-.
 by rewrite -[RHS]mulnA [_`! * i`!]mulnC mulnA.
 Qed.
 
-Theorem CatV i : C i = i.*2`! %/ (i`! * i.+1`!).
+Theorem CatV i : Cat i = i.*2`! %/ (i`! * i.+1`!).
 Proof.
 have:= CatM i; rewrite -mulnA => /(congr1 (fun j => j %/ (i`! * (i.+1)`!))).
 by rewrite mulnK // muln_gt0 !fact_gt0.
 Qed.
 
-Theorem Cat i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem CatE i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
 case: (ltnP 0 i)=> [Hi|]; last first.
-  by rewrite leqn0 => /eqP ->; rewrite C0 bin0 divn1.
+  by rewrite leqn0 => /eqP ->; rewrite Cat0 bin0 divn1.
 rewrite (CatV i) factS [i.+1 * _]mulnC mulnA.
 by rewrite -{3}(addnK i i) addnn divnMA bin_factd // double_gt0.
 Qed.
@@ -194,18 +199,18 @@ Proposition FC_fixpoint_eq n : (FC n.+1 - 1) = lagrfix ((1 + \X) ^+ 2).
 Proof.
 apply: (lagrfix_uniq (one_plusX_2_unit _)).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
-rewrite rmorphXn rmorphD /= comp_tfps1 comp_tfpsX //; first last.
+rewrite rmorphXn rmorphD /= comp_tfps1 comp_tfpsX //.
   rewrite coeft0_eq0E coef_trXn coeftB coeft1.
-  by rewrite coef_tfps_of_fun /= C0 subrr.
+  by rewrite coef_tfps_of_fun /= Cat0 subrr.
 rewrite -(trXnt1 _ n.+1) raddfB /= addrC subrK -rmorphXn /=.
 apply/tfpsP => i le_in1.
 rewrite coef_tfpsXM coeft_tmulX coef_trXnt.
 by case: i le_in1.
 Qed.
 
-Theorem CatM_Lagrange i : (i.+1 * (C i))%N = 'C(i.*2, i).
+Theorem CatM_Lagrange i : (i.+1 * (Cat i))%N = 'C(i.*2, i).
 Proof.
-case: i => [|i]; first by rewrite C0 mul1n bin0.
+case: i => [|i]; first by rewrite Cat0 mul1n bin0.
 apply/eqP; rewrite -(Num.Theory.eqr_nat rat); rewrite natrM.
 have:= congr1 (fun s : {tfps rat i.+1} => s`_i.+1) (FC_fixpoint_eq i).
 rewrite coef_tfps coeftD coef_tfps_of_fun ltnSn.
@@ -216,7 +221,7 @@ have Hord : (i < (i.+1).*2.+1)%N.
   by rewrite ltnS doubleS -addnn -!addnS leq_addr.
 rewrite (bigD1 (Ordinal Hord)) //= -!/(_`_i.+1).
 rewrite coeftMn coef_tfpsXn // eqxx leqnn /= (_ : 1%:R = 1) //.
-rewrite big1 ?addr0 => [|[j /= Hj]]; first last.
+rewrite big1 ?addr0 => [[j /= Hj] |].
   rewrite -val_eqE /= => {Hj} /negbTE Hj.
   by rewrite coeftMn coef_tfpsXn eq_sym Hj andbF mul0rn.
 rewrite ltnS in Hord.
@@ -226,7 +231,7 @@ Qed.
 
 Local Close Scope ring_scope.
 
-Theorem Cat_Lagrange i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem Cat_Lagrange i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
 by have:= congr1 (fun m => m %/ i.+1) (CatM_Lagrange i); rewrite mulnC mulnK.
 Qed.
@@ -279,27 +284,27 @@ Qed.
 Local Close Scope ring_scope.
 Local Close Scope tfps_scope.
 
-Proposition Catalan_rec n : n.+2 * C (n.+1) = (4 * n + 2) * C n.
+Proposition Catalan_rec n : n.+2 * Cat (n.+1) = (4 * n + 2) * Cat n.
 Proof.
 have := congr1 (fun x : {tfps _ _} => (x`_n.+1)%R) (FC_differential_eq n).
 rewrite coef1 coeftD !mulrDl !mul1r !coeftD.
 rewrite -!mulNrn !(mulrnAl, coeftMn, mulNr, coeftN).
 rewrite !coef_tfpsXM coeft_tmulX !coef_deriv_tfps !coef_tfps_of_fun /=.
 rewrite ltnSn leqnSn /= ltnS leq_pred.
-case: n => [|n] /=; first by rewrite !Csimpl.
-move: {n} n.+1 => n; move: (C n.+1) (C n) => Cn1 Cn.
+case: n => [|n] /=; first by rewrite !Catsimpl.
+move: {n} n.+1 => n; move: (Cat n.+1) (Cat n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
 move/eqP; rewrite subr_eq add0r subr_eq -natrD Num.Theory.eqr_nat => /eqP.
 rewrite mulnC -mulnDr => ->.
 by rewrite mulnC [n * 4]mulnC.
 Qed.
 
-Theorem CatM_from_rec n : n.+1 * C n = 'C(n.*2, n).
+Theorem CatM_from_rec n : n.+1 * Cat n = 'C(n.*2, n).
 Proof.
-elim: n => [| n IHn] /=; first by rewrite C0 bin0.
+elim: n => [| n IHn] /=; first by rewrite Cat0 bin0.
 rewrite Catalan_rec doubleS !binS.
 have leq_n2 : n <= n.*2 by rewrite -addnn leq_addr.
-rewrite -[X in _ + _ + X]bin_sub; last exact: (leq_trans leq_n2 (leqnSn _)).
+rewrite -[X in _ + _ + X]bin_sub; first exact: (leq_trans leq_n2 (leqnSn _)).
 rewrite subSn // -{4}addnn addnK binS addnn.
 rewrite addn2 -[4]/(2 * 2) -mulnA !mul2n -doubleS -doubleMl; congr _.*2.
 rewrite -IHn -{1}addnn -addnS mulnDl; congr (_ + _).
@@ -309,9 +314,9 @@ rewrite -mulnA ![n.+1 * _]mulnC => /(congr1 (fun m => m %/ n.+1)).
 by rewrite !mulnK.
 Qed.
 
-Theorem Cat_from_rec i : C i = 'C(i.*2, i) %/ i.+1.
+Theorem Cat_from_rec i : Cat i = 'C(i.*2, i) %/ i.+1.
 Proof.
-by have:= congr1 (fun m => m %/ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
+by have:= congr1 (divn^~ i.+1) (CatM_from_rec i); rewrite mulnC mulnK.
 Qed.
 
 End HolonomicSolution.

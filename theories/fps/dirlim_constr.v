@@ -1,15 +1,18 @@
 (** Direct limits *)
 (******************************************************************************)
-(*       Copyright (C) 2021 Florent Hivert <florent.hivert@lri.fr>            *)
+(*    Copyright (C) 2019-2026 Florent Hivert <florent.hivert@lisn.fr>         *)
 (*                                                                            *)
-(*  Distributed under the terms of the GNU General Public License (GPL)       *)
+(*    This program is free software; you can redistribute it and/or           *)
+(*    modify it under the terms of the GNU Lesser General Public              *)
+(*    License as published by the Free Software Foundation; either            *)
+(*    version 3 of the License, or (at your option) any later version.        *)
 (*                                                                            *)
 (*    This code is distributed in the hope that it will be useful,            *)
 (*    but WITHOUT ANY WARRANTY; without even the implied warranty of          *)
 (*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU       *)
 (*    General Public License for more details.                                *)
 (*                                                                            *)
-(*  The full text of the GPL is available at:                                 *)
+(*    The full text of the LGPL is available at:                              *)
 (*                                                                            *)
 (*                  http://www.gnu.org/licenses/                              *)
 (******************************************************************************)
@@ -96,11 +99,11 @@ comUnitAlgDirLimType Sys == direct limits of commutative algebras with
                            The HB class is called ComUnitAlgebraDirLim
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
-From mathcomp Require Import order bigop.
+From mathcomp Require Import all_boot order ssralg.
 
 Require Import natbar directed.
 
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Import GRing.Theory.
 Import Order.Syntax.
@@ -112,10 +115,12 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Reserved Notation "{ 'dirlim' S }" (at level 0, format "{ 'dirlim'  S }").
-Reserved Notation "''inj_' i" (at level 0, i at level 2, format "''inj_' i").
-Reserved Notation "''inj[' T ']'" (at level 0).
-Reserved Notation "''inj[' T ']_' i" (at level 0, i at level 2).
-Reserved Notation "''ind[' T ']'" (at level 0).
+Reserved Notation "''inj_' i" (at level 1, i at level 2, format "''inj_' i").
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''inj[' T ']'" (at level 1).
+Reserved Notation "''inj[' T ']_' i" (at level 1, i at level 2).
+#[warning="-closed-notation-not-level-0"]
+Reserved Notation "''ind[' T ']'" (at level 1).
 
 
 
@@ -753,7 +758,7 @@ HB.structure Definition LSemiModuleDirLim
 
 Section LSemiModuleDirLimTheory.
 
-Variable (R : pzRingType).
+Variable (R : pzSemiRingType).
 Variables (disp : _) (I : dirType disp).
 Variable Obj : I -> lSemiModType R.
 Variable bonding : forall i j, i <= j -> {linear Obj i -> Obj j}.
@@ -766,7 +771,7 @@ HB.instance Definition _ i :=
 (** The universal induced map is a L-semi-module morphism *)
 Section UniversalProperty.
 
-Variable (T : lmodType R) (f : forall i, {linear Obj i -> T}).
+Variable (T : lSemiModType R) (f : forall i, {linear Obj i -> T}).
 Hypothesis Hcone : cocone Sys f.
 
 Fact dlind_is_semilinear : semilinear ('ind Hcone : dlT -> T).
@@ -800,7 +805,7 @@ HB.structure Definition LmoduleDirLim
 
 #[short(type="lSemiAlgDirLimType")]
 HB.structure Definition LSemiAlgebraDirLim
-    (R : pzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -813,7 +818,7 @@ HB.structure Definition LSemiAlgebraDirLim
 
 Section LSemiAlgebraDirLimTheory.
 
-Variable (R : pzRingType).
+Variable (R : nzSemiRingType).
 Variables (disp : _) (I : dirType disp).
 Variable Obj : I -> lSemiAlgType R.
 Variable bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j}.
@@ -822,25 +827,24 @@ Variable dlT : lSemiAlgDirLimType Sys.
 
 (* Rebuilt the various instances on a lalgtype. *)
 HB.instance Definition _ i := GRing.Linear.on 'inj[dlT]_i.
-(* Check fun i => 'inj[dlT]_i : {lrmorphism Obj i -> dlT}. *)
+Let checkinj := fun i => 'inj[dlT]_i : {lrmorphism Obj i -> dlT}.
 
 (** The universal induced map is a L-semi-algebra morphism *)
 Section UniversalProperty.
 
-Variable (T : lalgType R) (f : forall i, {lrmorphism Obj i -> T}).
+Variable (T : lSemiAlgType R) (f : forall i, {lrmorphism Obj i -> T}).
 Hypothesis Hcone : cocone Sys f.
 
 (* Rebuild the various instances on a lalgtype. *)
 HB.instance Definition _ i := GRing.Linear.on ('ind[dlT] Hcone).
-(* Check 'ind[dlT] Hcone : {lrmorphism T -> dlT}. *)
-
+Let checkind := 'ind[dlT] Hcone : {lrmorphism dlT -> T}.
 End UniversalProperty.
 End LSemiAlgebraDirLimTheory.
 
 
 #[short(type="lalgDirLimType")]
 HB.structure Definition LalgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -854,7 +858,7 @@ HB.structure Definition LalgebraDirLim
 
 #[short(type="semiAlgDirLimType")]
 HB.structure Definition SemiAlgebraDirLim
-    (R : pzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -868,7 +872,7 @@ HB.structure Definition SemiAlgebraDirLim
 
 #[short(type="algDirLimType")]
 HB.structure Definition AlgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -882,7 +886,7 @@ HB.structure Definition AlgebraDirLim
 
 #[short(type="comSemiAlgDirLimType")]
 HB.structure Definition ComSemiAlgebraDirLim
-    (R : pzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> comSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -895,7 +899,7 @@ HB.structure Definition ComSemiAlgebraDirLim
 
 #[short(type="comAlgDirLimType")]
 HB.structure Definition ComAlgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> comAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -908,7 +912,7 @@ HB.structure Definition ComAlgebraDirLim
 
 #[short(type="unitAlgDirLimType")]
 HB.structure Definition UnitAlgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> unitAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -921,7 +925,7 @@ HB.structure Definition UnitAlgebraDirLim
 
 #[short(type="comUnitAlgDirLimType")]
 HB.structure Definition ComUnitAlgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> comUnitAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1695,14 +1699,14 @@ HB.end.
 
 
 HB.factory Record LSemiModuleDirLim_isLSemiAlgebraDirLim
-    (R : pzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of LSemiModuleDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1727,14 +1731,14 @@ HB.end.
 
 
 HB.factory Record LmoduleDirLim_isLalgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of LmoduleDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1746,14 +1750,14 @@ HB.end.
 
 
 HB.factory Record DirLim_isLalgebraDirLim
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of DirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : pzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> lalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1767,14 +1771,14 @@ HB.end.
 
 
 HB.factory Record LSemiAlgebraDirLim_isSemiAlgebraDirLim
-    (R : comPzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of LSemiAlgebraDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : comPzRingType)
+    (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1794,14 +1798,14 @@ HB.end.
 
 
 HB.factory Record LalgebraDirLim_isAlgebraDirLim
-    (R : comPzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of LalgebraDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : comPzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
@@ -1813,14 +1817,14 @@ HB.end.
 
 
 HB.factory Record DirLim_isAlgebraDirLim
-    (R : comPzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   dlT of DirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : comPzRingType)
+    (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> algType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
