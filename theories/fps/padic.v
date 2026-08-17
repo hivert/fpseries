@@ -168,7 +168,7 @@ End PadicInvSys.
 Section PadicTheory.
 
 Variables (p : nat) (p_pr : prime p).
-Local Notation Zp := (padic_int p_pr).
+Local Abbreviation Zp := (padic_int p_pr).
 
 Let prime_gt1 := prime_gt1 p_pr.
 Let primeX_gt0 := primeX_gt0 p_pr.

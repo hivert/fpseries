@@ -1426,8 +1426,8 @@ Section Coefficient01Ring.
 Variables (R : nzRingType) (n : nat).
 Implicit Types (f g : {tfps R n}).
 
-Local Notation coeft0_eq0 := (@coeft0_eq0 R n).
-Local Notation coeft0_eq1 := (@coeft0_eq1 R n).
+Local Abbreviation coeft0_eq0 := (@coeft0_eq0 R n).
+Local Abbreviation coeft0_eq1 := (@coeft0_eq1 R n).
 
 Fact coeft0_eq0_idealr : idealr_closed coeft0_eq0.
 Proof.
@@ -3586,7 +3586,7 @@ Hypothesis char_K_is_zero : [pchar K] =i pred0.
 Lemma nat_unit_field : nat_unit K.
 Proof. by move=> i; rewrite unitfE; move: char_K_is_zero => /pcharf0P ->. Qed.
 
-Local Notation nuf := nat_unit_field.
+Local Abbreviation nuf := nat_unit_field.
 
 (* TODO : the three lemma below should be elsewhere *)
 (* as they have nothing to do with power series     *)
