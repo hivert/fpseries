@@ -80,18 +80,18 @@ comUnitRingDirLimType Sys == direct limits of commutative rings with
                            The HB class is called LSemiModuleDirLim
      lmodDirLimType Sys == direct limits of left modules
                            The HB class is called LmoduleDirLim
- lSemiAlgDirLimType Sys == direct limits of left semi-algebras
-                           The HB class is called LSemiAlgebraDirLim
-     lalgDirLimType Sys == direct limits of left algebras
-                           The HB class is called LalgebraDirLim
-  semiAlgDirLimType Sys == direct limits of semi-algebras
-                           The HB class is called SemiAlgebraDirLim
-      algDirLimType Sys == direct limits of algebras
-                           The HB class is called AlgebraDirLim
-comSemiAlgDirLimType Sys == direct limits of commutative semi-algebras
-                           The HB class is called ComSemiAlgebraDirLim
-   comAlgDirLimType Sys == direct limits of commutative algebras
-                           The HB class is called ComAlgebraDirLim
+nzLSemiAlgDirLimType Sys == direct limits of left semi-algebras
+                           The HB class is called NzLSemiAlgebraDirLim
+   nzLalgDirLimType Sys == direct limits of left algebras
+                           The HB class is called NzLalgebraDirLim
+nzSemiAlgDirLimType Sys == direct limits of semi-algebras
+                           The HB class is called NzSemiAlgebraDirLim
+    nzAlgDirLimType Sys == direct limits of algebras
+                           The HB class is called NzAlgebraDirLim
+comNzSemiAlgDirLimType Sys == direct limits of commutative semi-algebras
+                           The HB class is called ComNzSemiAlgebraDirLim
+ comNzAlgDirLimType Sys == direct limits of commutative algebras
+                           The HB class is called ComNzAlgebraDirLim
   unitAlgDirLimType Sys == direct limits of algebras with computable units
                            The HB class is called UnitAlgebraDirLim
 comUnitAlgDirLimType Sys == direct limits of commutative algebras with

@@ -87,18 +87,18 @@ comUnitRingInvLimType Sys == inverse limits of commutative rings with
                            The HB class is called LSemiModuleInvLim
      lmodInvLimType Sys == inverse limits of left modules
                            The HB class is called LmoduleInvLim
- lSemiAlgInvLimType Sys == inverse limits of left semi-algebras
-                           The HB class is called LSemiAlgebraInvLim
-     lalgInvLimType Sys == inverse limits of left algebras
-                           The HB class is called LalgebraInvLim
-  semiAlgInvLimType Sys == inverse limits of semi-algebras
-                           The HB class is called SemiAlgebraInvLim
-      algInvLimType Sys == inverse limits of algebras
-                           The HB class is called AlgebraInvLim
-comSemiAlgInvLimType Sys == inverse limits of commutative semi-algebras
-                           The HB class is called ComSemiAlgebraInvLim
-   comAlgInvLimType Sys == inverse limits of commutative algebras
-                           The HB class is called ComAlgebraInvLim
+nzLSemiAlgInvLimType Sys == inverse limits of left semi-algebras
+                           The HB class is called NzLSemiAlgebraInvLim
+   nzLalgInvLimType Sys == inverse limits of left algebras
+                           The HB class is called NzLalgebraInvLim
+nzSemiAlgInvLimType Sys == inverse limits of semi-algebras
+                           The HB class is called NzSemiAlgebraInvLim
+    nzAlgInvLimType Sys == inverse limits of algebras
+                           The HB class is called NzAlgebraInvLim
+comNzSemiAlgInvLimType Sys == inverse limits of commutative semi-algebras
+                           The HB class is called ComNzSemiAlgebraInvLim
+ comNzAlgInvLimType Sys == inverse limits of commutative algebras
+                           The HB class is called ComNzAlgebraInvLim
   unitAlgInvLimType Sys == inverse limits of algebras with computable units
                            The HB class is called UnitAlgebraInvLim
 comUnitAlgInvLimType Sys == inverse limits of commutative algebras with
