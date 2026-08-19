@@ -42,7 +42,7 @@ In what follows we assume that [p] is a prime number with [p_pr : prime p].
                   canonical structures.
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot all_algebra.
+From mathcomp Require Import boot algebra.
 From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import order.
 

@@ -27,7 +27,7 @@ order canonical structures.
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 From mathcomp Require Import order ssralg.
 
 

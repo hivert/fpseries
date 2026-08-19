@@ -35,7 +35,7 @@ We also define
 
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot order ssralg.
+From mathcomp Require Import boot order ssralg.
 From mathcomp Require Import boolp classical_sets.
 
 Require Import natbar directed dirlim_constr.
@@ -515,7 +515,7 @@ End LModule.
 
 Section LSemiAlgebra.
 Variables (R : nzSemiRingType).
-Variable Obj : I -> lSemiAlgType R.
+Variable Obj : I -> nzLSemiAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
@@ -524,7 +524,7 @@ End LSemiAlgebra.
 
 Section Lalgebra.
 Variables (R : nzRingType).
-Variable Obj : I -> lalgType R.
+Variable Obj : I -> nzLalgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
@@ -533,7 +533,7 @@ End Lalgebra.
 
 Section SemiAlgebra.
 Variables (R : nzSemiRingType).
-Variable Obj : I -> semiAlgType R.
+Variable Obj : I -> nzSemiAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
@@ -542,7 +542,7 @@ End SemiAlgebra.
 
 Section Alg.
 Variables (R : nzRingType).
-Variable Obj : I -> algType R.
+Variable Obj : I -> nzAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
@@ -560,11 +560,11 @@ End UnitAlgebra.
 
 Section ComAlgebra.
 Variables (R : nzRingType).
-Variable Obj : I -> comAlgType R.
+Variable Obj : I -> comNzAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ := DirLim.on {dirlim Sys}.
-Let test : comAlgDirLimType Sys := {dirlim Sys}.
+Let test : comNzAlgDirLimType Sys := {dirlim Sys}.
 End ComAlgebra.
 
 Section ComUnitAlgebra.
@@ -586,6 +586,6 @@ Variable Obj : I -> comUnitAlgType R.
 Variable bonding : forall i j, (i <= j)%O -> {lrmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 Let test : comUnitAlgDirLimType _ := {dirlim Sys}.
-Let test1 : algDirLimType _ := {dirlim Sys}.
+Let test1 : nzAlgDirLimType _ := {dirlim Sys}.
 Let test2 : comUnitRingDirLimType _ := {dirlim Sys}.
 End TestComUnitAlg.

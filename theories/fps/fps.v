@@ -102,7 +102,7 @@ We prove the [Lagrange_Bürmann] theorem giving the coefficent of the Lagrange
 fixpoint and its compose series.
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot order.
+From mathcomp Require Import boot order.
 From mathcomp Require Import ssralg poly ring_quotient (* avoid sesquilinear *).
 From mathcomp Require Import boolp classical_sets.
 
@@ -305,7 +305,7 @@ Variable R : nzRingType.
 
 HB.instance Definition _ :=
   InvLim_isZmodInvLim.Build _ _ _ _ (fps_invsys R) {fps R}.
-Let check := {fps R} : lalgType R.
+Let check := {fps R} : nzLalgType R.
 
 Implicit Types (a b c : R) (s t u : {fps R}) (p q : {poly R}) (i j : nat).
 

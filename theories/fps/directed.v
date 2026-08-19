@@ -24,7 +24,7 @@
 \(x, y\in S\) there is a \(z\in S\) such that \(x\leq z\) and \(y\leq z\).
 *******************************************************************************)
 From HB Require Import structures.
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 From mathcomp Require Import order.
 
 Require Import natbar.

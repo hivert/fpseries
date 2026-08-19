@@ -17,7 +17,7 @@
 (******************************************************************************)
 (** An example of direct limits                                               *)
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
+From mathcomp Require Import boot ssralg.
 From mathcomp Require Import freeg mpoly.
 From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import order.

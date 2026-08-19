@@ -1,5 +1,5 @@
 From HB Require Import structures.
-From mathcomp Require Import all_boot order ssralg fraction.
+From mathcomp Require Import boot order ssralg fraction.
 From mathcomp Require Import boolp classical_sets.
 
 Require Import auxresults natbar directed tfps invlim fps.
