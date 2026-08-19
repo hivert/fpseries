@@ -245,7 +245,7 @@ HB.builders Context
   dlT of DirLim_isComUnitRingDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ := DirLim_isUnitRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  PzSemiRingDirLim_isComPzSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_isComSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.end.
 
 
@@ -399,29 +399,29 @@ HB.instance Definition _ :=
   NmoduleDirLim_isZmoduleDirLim.Build _ _ _ _ Sys {dirlim Sys}.
 End ZModule.
 
-Section PzSemiRing.
-Variable Obj : I -> pzSemiRingType.
+Section SemiRing.
+Variable Obj : I -> semiRingType.
 Variable bonding : forall i j, (i <= j)%O -> {rmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
-  NmoduleDirLim_isPzSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
-End PzSemiRing.
+  NmoduleDirLim_isSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
+End SemiRing.
 
 Section NzSemiRing.
 Variable Obj : I -> nzSemiRingType.
 Variable bonding : forall i j, (i <= j)%O -> {rmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
-  PzSemiRingDirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
+  SemiRingDirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
 End NzSemiRing.
 
-Section PzRing.
-Variable Obj : I -> pzRingType.
+Section Ring.
+Variable Obj : I -> ringType.
 Variable bonding : forall i j, (i <= j)%O -> {rmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
-  PzSemiRingDirLim_isPzRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
-End PzRing.
+  SemiRingDirLim_isRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
+End Ring.
 
 Section NzRing.
 Variable Obj : I -> nzRingType.
@@ -431,13 +431,13 @@ HB.instance Definition _ := DirLim.on {dirlim Sys}.
 Let test : nzRingDirLimType _ := {dirlim Sys}.
 End NzRing.
 
-Section PzComSemiRing.
-Variable Obj : I -> comPzSemiRingType.
+Section ComSemiRing.
+Variable Obj : I -> comSemiRingType.
 Variable bonding : forall i j, (i <= j)%O -> {rmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ :=
-  PzSemiRingDirLim_isComPzSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
-End PzComSemiRing.
+  SemiRingDirLim_isComSemiRingDirLim.Build _ _ _ _ Sys {dirlim Sys}.
+End ComSemiRing.
 
 Section ComNzSemiRing.
 Variable Obj : I -> comNzSemiRingType.
@@ -447,13 +447,13 @@ HB.instance Definition _ := DirLim.on {dirlim Sys}.
 Let test : comNzSemiRingDirLimType _ := {dirlim Sys}.
 End ComNzSemiRing.
 
-Section ComPzRing.
-Variable Obj : I -> comPzRingType.
+Section ComRing.
+Variable Obj : I -> comRingType.
 Variable bonding : forall i j, (i <= j)%O -> {rmorphism Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
 HB.instance Definition _ := DirLim.on {dirlim Sys}.
-Let test : comPzRingDirLimType _ := {dirlim Sys}.
-End ComPzRing.
+Let test : comRingDirLimType _ := {dirlim Sys}.
+End ComRing.
 
 Section ComNzRing.
 Variable Obj : I -> comNzRingType.
@@ -496,7 +496,7 @@ HB.instance Definition _ :=
 End Field.
 
 Section LSemiModule.
-Variables (R : pzSemiRingType).
+Variables (R : semiRingType).
 Variable Obj : I -> lSemiModType R.
 Variable bonding : forall i j, (i <= j)%O -> {linear Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
@@ -505,7 +505,7 @@ HB.instance Definition _ :=
 End LSemiModule.
 
 Section LModule.
-Variables (R : pzRingType).
+Variables (R : ringType).
 Variable Obj : I -> lmodType R.
 Variable bonding : forall i j, (i <= j)%O -> {linear Obj i -> Obj j}.
 Variable Sys : is_dirsys bonding.
