@@ -46,9 +46,9 @@ This file defines the following algebraic structures:
          dirLimType Sys == direct limits of sets (Type)
                            The HB class is called DirLim
      nmodDirLimType Sys == direct limits of N-modules
-                           The HB class is called NmoduleDirLim
+                           The HB class is called NmodDirLim
      zmodDirLimType Sys == direct limits of Z-modules
-                           The HB class is called ZmoduleDirLim
+                           The HB class is called ZmodDirLim
  semiRingDirLimType Sys == direct limits of semi rings
                            The HB class is called SemiRingDirLim
 nzSemiRingDirLimType Sys == direct limits of non trivial semi rings
@@ -77,26 +77,26 @@ comUnitRingDirLimType Sys == direct limits of commutative rings with
                            The HB class is called FieldDirLim
  lSemiModDirLimType Sys == direct limits of left semimodules. The base
                            ring is inferred from the system Sys.
-                           The HB class is called LSemiModuleDirLim
+                           The HB class is called LSemiModDirLim
      lmodDirLimType Sys == direct limits of left modules
-                           The HB class is called LmoduleDirLim
+                           The HB class is called LmodDirLim
 nzLSemiAlgDirLimType Sys == direct limits of left semi-algebras
-                           The HB class is called NzLSemiAlgebraDirLim
+                           The HB class is called NzLSemiAlgDirLim
    nzLalgDirLimType Sys == direct limits of left algebras
-                           The HB class is called NzLalgebraDirLim
+                           The HB class is called NzLalgDirLim
 nzSemiAlgDirLimType Sys == direct limits of semi-algebras
-                           The HB class is called NzSemiAlgebraDirLim
+                           The HB class is called NzSemiAlgDirLim
     nzAlgDirLimType Sys == direct limits of algebras
-                           The HB class is called NzAlgebraDirLim
+                           The HB class is called NzAlgDirLim
 comNzSemiAlgDirLimType Sys == direct limits of commutative semi-algebras
-                           The HB class is called ComNzSemiAlgebraDirLim
+                           The HB class is called ComNzSemiAlgDirLim
  comNzAlgDirLimType Sys == direct limits of commutative algebras
-                           The HB class is called ComNzAlgebraDirLim
+                           The HB class is called ComNzAlgDirLim
   unitAlgDirLimType Sys == direct limits of algebras with computable units
-                           The HB class is called UnitAlgebraDirLim
+                           The HB class is called UnitAlgDirLim
 comUnitAlgDirLimType Sys == direct limits of commutative algebras with
                            computable units
-                           The HB class is called ComUnitAlgebraDirLim
+                           The HB class is called ComUnitAlgDirLim
 *******************************************************************************)
 From HB Require Import structures.
 From mathcomp Require Import boot order ssralg.
@@ -395,7 +395,7 @@ Arguments dsysequal {disp I Obj bonding} (Sys) (u v).
 (****************************************************************************)
 
 #[key="dlT"]
-HB.mixin Record isNmoduleDirLim
+HB.mixin Record isNmodDirLim
     disp (I : dirType disp)
     (Obj : I -> nmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
@@ -405,18 +405,18 @@ HB.mixin Record isNmoduleDirLim
     forall i, nmod_morphism ('inj[dlT]_i)
   }.
 #[short(type="nmodDirLimType")]
-HB.structure Definition NmoduleDirLim
+HB.structure Definition NmodDirLim
     disp (I : dirType disp)
     (Obj : I -> nmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
     dlT of DirLim disp Sys dlT
-    & isNmoduleDirLim disp I Obj bonding Sys dlT
+    & isNmodDirLim disp I Obj bonding Sys dlT
     & GRing.Nmodule dlT
   }.
 
-Section NmoduleDirLimTheory.
+Section NmodDirLimTheory.
 
 Variables (disp : _) (I : dirType disp).
 Variable Obj : I -> nmodType.
@@ -457,21 +457,21 @@ rewrite -(dl0E i) => /eqP/dirlimE [k lejk leik Heq].
 by exists k; exists lejk; rewrite Heq raddf0.
 Qed.
 
-End NmoduleDirLimTheory.
+End NmodDirLimTheory.
 
 
 #[short(type="zmodDirLimType")]
-HB.structure Definition ZmoduleDirLim
+HB.structure Definition ZmodDirLim
     disp (I : dirType disp)
     (Obj : I -> zmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
-    dlT of NmoduleDirLim disp Sys dlT
+    dlT of NmodDirLim disp Sys dlT
     & GRing.Zmodule dlT
   }.
 
-Section ZmoduleDirLimTheory.
+Section ZmodDirLimTheory.
 
 Variables (disp : _) (I : dirType disp).
 Variable Obj : I -> zmodType.
@@ -495,7 +495,7 @@ Qed.
 
 End UniversalProperty.
 
-End ZmoduleDirLimTheory.
+End ZmodDirLimTheory.
 
 
 #[key="dlT"]
@@ -515,7 +515,7 @@ HB.structure Definition SemiRingDirLim
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
-    dlT of NmoduleDirLim disp Sys dlT
+    dlT of NmodDirLim disp Sys dlT
     & isSemiRingDirLim disp I Obj bonding Sys dlT
     & GRing.SemiRing dlT
   }.
@@ -571,7 +571,7 @@ HB.structure Definition NzSemiRingDirLim
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
-    dlT of NmoduleDirLim disp Sys dlT
+    dlT of NmodDirLim disp Sys dlT
     & isSemiRingDirLim disp I Obj bonding Sys dlT
     & GRing.NzSemiRing dlT
   }.
@@ -733,7 +733,7 @@ HB.structure Definition FieldDirLim
 
 
 #[key="dlT"]
-HB.mixin Record isLSemiModuleDirLim
+HB.mixin Record isLSemiModDirLim
     (R : semiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiModType R)
@@ -744,19 +744,19 @@ HB.mixin Record isLSemiModuleDirLim
     forall i, semilinear ('inj[dlT]_i)
   }.
 #[short(type="lSemiModDirLimType")]
-HB.structure Definition LSemiModuleDirLim
+HB.structure Definition LSemiModDirLim
     (R : semiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiModType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
-    dlT of NmoduleDirLim _ Sys dlT
-    & isLSemiModuleDirLim R disp I Obj bonding Sys dlT
+    dlT of NmodDirLim _ Sys dlT
+    & isLSemiModDirLim R disp I Obj bonding Sys dlT
     & GRing.LSemiModule R dlT
   }.
 
-Section LSemiModuleDirLimTheory.
+Section LSemiModDirLimTheory.
 
 Variable (R : semiRingType).
 Variables (disp : _) (I : dirType disp).
@@ -786,25 +786,64 @@ HB.instance Definition _ :=
   GRing.isSemilinear.Build R dlT T _ _ (dlind_is_semilinear).
 
 End UniversalProperty.
-End LSemiModuleDirLimTheory.
+End LSemiModDirLimTheory.
 
 
 #[short(type="lmodDirLimType")]
-HB.structure Definition LmoduleDirLim
+HB.structure Definition LmodDirLim
     (R : ringType)
     disp (I : dirType disp)
     (Obj : I -> lmodType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
   := {
-    dlT of ZmoduleDirLim _ Sys dlT
-    & isLSemiModuleDirLim R disp I Obj bonding Sys dlT
+    dlT of ZmodDirLim _ Sys dlT
+    & isLSemiModDirLim R disp I Obj bonding Sys dlT
     & GRing.Lmodule R dlT
   }.
 
 
+#[short(type="lSemiAlgDirLimType")]
+HB.structure Definition LSemiAlgDirLim
+    (R : semiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> lSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.LSemiAlgebra R dlT
+    & SemiRingDirLim _ Sys dlT
+    & LSemiModDirLim _ Sys dlT
+  }.
+
+Section LSemiAlgDirLimTheory.
+
+Variable (R : semiRingType).
+Variables (disp : _) (I : dirType disp).
+Variable Obj : I -> lSemiAlgType R.
+Variable bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j}.
+Variable Sys : is_dirsys bonding.
+Variable dlT : lSemiAlgDirLimType Sys.
+
+(* Rebuilt the various instances on a lSemiAlgtype. *)
+HB.instance Definition _ i := GRing.Linear.on 'inj[dlT]_i.
+Let checkinj := fun i => 'inj[dlT]_i : {lrmorphism Obj i -> dlT}.
+
+(** The universal induced map is a L-semi-algebra morphism *)
+Section UniversalProperty.
+
+Variable (T : lSemiAlgType R) (f : forall i, {lrmorphism Obj i -> T}).
+Hypothesis Hcone : cocone Sys f.
+
+(* Rebuild the various instances on a lSemiAlgtype. *)
+HB.instance Definition _ i := GRing.Linear.on ('ind[dlT] Hcone).
+Let checkind := 'ind[dlT] Hcone : {lrmorphism dlT -> T}.
+End UniversalProperty.
+End LSemiAlgDirLimTheory.
+
+
 #[short(type="nzLSemiAlgDirLimType")]
-HB.structure Definition NzLSemiAlgebraDirLim
+HB.structure Definition NzLSemiAlgDirLim
     (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> nzLSemiAlgType R)
@@ -812,38 +851,26 @@ HB.structure Definition NzLSemiAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.NzLSemiAlgebra R dlT
-    & NzSemiRingDirLim _ Sys dlT
-    & LSemiModuleDirLim _ Sys dlT
+    & LSemiAlgDirLim _ Sys dlT
   }.
 
-Section NzLSemiAlgebraDirLimTheory.
 
-Variable (R : nzSemiRingType).
-Variables (disp : _) (I : dirType disp).
-Variable Obj : I -> nzLSemiAlgType R.
-Variable bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j}.
-Variable Sys : is_dirsys bonding.
-Variable dlT : nzLSemiAlgDirLimType Sys.
-
-(* Rebuilt the various instances on a lalgtype. *)
-HB.instance Definition _ i := GRing.Linear.on 'inj[dlT]_i.
-Let checkinj := fun i => 'inj[dlT]_i : {lrmorphism Obj i -> dlT}.
-
-(** The universal induced map is a L-semi-algebra morphism *)
-Section UniversalProperty.
-
-Variable (T : nzLSemiAlgType R) (f : forall i, {lrmorphism Obj i -> T}).
-Hypothesis Hcone : cocone Sys f.
-
-(* Rebuild the various instances on a lalgtype. *)
-HB.instance Definition _ i := GRing.Linear.on ('ind[dlT] Hcone).
-Let checkind := 'ind[dlT] Hcone : {lrmorphism dlT -> T}.
-End UniversalProperty.
-End NzLSemiAlgebraDirLimTheory.
+#[short(type="lalgDirLimType")]
+HB.structure Definition LalgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> lalgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.Lalgebra R dlT
+    & RingDirLim _ Sys dlT
+    & LmodDirLim _ Sys dlT
+  }.
 
 
 #[short(type="nzLalgDirLimType")]
-HB.structure Definition NzLalgebraDirLim
+HB.structure Definition NzLalgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> nzLalgType R)
@@ -851,13 +878,26 @@ HB.structure Definition NzLalgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.NzLalgebra R dlT
-    & RingDirLim _ Sys dlT
-    & LmoduleDirLim _ Sys dlT
+    & LalgDirLim _ Sys dlT
+  }.
+
+
+#[short(type="semiAlgDirLimType")]
+HB.structure Definition SemiAlgDirLim
+    (R : semiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> semiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.SemiAlgebra R dlT
+    & SemiRingDirLim _ Sys dlT
+    & LSemiModDirLim _ Sys dlT
   }.
 
 
 #[short(type="nzSemiAlgDirLimType")]
-HB.structure Definition NzSemiAlgebraDirLim
+HB.structure Definition NzSemiAlgDirLim
     (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> nzSemiAlgType R)
@@ -865,13 +905,26 @@ HB.structure Definition NzSemiAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.NzSemiAlgebra R dlT
-    & SemiRingDirLim _ Sys dlT
-    & LSemiModuleDirLim _ Sys dlT
+    & SemiAlgDirLim _ Sys dlT
+  }.
+
+
+#[short(type="algDirLimType")]
+HB.structure Definition AlgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> algType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.Algebra R dlT
+    & RingDirLim _ Sys dlT
+    & LmodDirLim _ Sys dlT
   }.
 
 
 #[short(type="nzAlgDirLimType")]
-HB.structure Definition NzAlgebraDirLim
+HB.structure Definition NzAlgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> nzAlgType R)
@@ -879,13 +932,25 @@ HB.structure Definition NzAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.NzAlgebra R dlT
-    & RingDirLim _ Sys dlT
-    & LmoduleDirLim _ Sys dlT
+    & AlgDirLim _ Sys dlT
+  }.
+
+
+#[short(type="comSemiAlgDirLimType")]
+HB.structure Definition ComSemiAlgDirLim
+    (R : semiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.ComSemiAlgebra R dlT
+    & SemiAlgDirLim R Sys dlT
   }.
 
 
 #[short(type="comNzSemiAlgDirLimType")]
-HB.structure Definition ComNzSemiAlgebraDirLim
+HB.structure Definition ComNzSemiAlgDirLim
     (R : nzSemiRingType)
     disp (I : dirType disp)
     (Obj : I -> comNzSemiAlgType R)
@@ -893,12 +958,25 @@ HB.structure Definition ComNzSemiAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.ComNzSemiAlgebra R dlT
-    & NzSemiAlgebraDirLim R Sys dlT
+    & ComSemiAlgDirLim R Sys dlT
+  }.
+
+
+#[short(type="comAlgDirLimType")]
+HB.structure Definition ComAlgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> comAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  := {
+    dlT of GRing.ComAlgebra R dlT
+    & AlgDirLim R Sys dlT
   }.
 
 
 #[short(type="comNzAlgDirLimType")]
-HB.structure Definition ComNzAlgebraDirLim
+HB.structure Definition ComNzAlgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> comNzAlgType R)
@@ -906,12 +984,12 @@ HB.structure Definition ComNzAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.ComNzAlgebra R dlT
-    & NzAlgebraDirLim R Sys dlT
+    & ComAlgDirLim R Sys dlT
   }.
 
 
 #[short(type="unitAlgDirLimType")]
-HB.structure Definition UnitAlgebraDirLim
+HB.structure Definition UnitAlgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> unitAlgType R)
@@ -919,12 +997,12 @@ HB.structure Definition UnitAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.UnitAlgebra R dlT
-    & NzAlgebraDirLim R Sys dlT
+    & NzAlgDirLim R Sys dlT
   }.
 
 
 #[short(type="comUnitAlgDirLimType")]
-HB.structure Definition ComUnitAlgebraDirLim
+HB.structure Definition ComUnitAlgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> comUnitAlgType R)
@@ -932,8 +1010,8 @@ HB.structure Definition ComUnitAlgebraDirLim
     (Sys : is_dirsys bonding)
   := {
     dlT of GRing.ComUnitAlgebra R dlT
-    & ComNzAlgebraDirLim R Sys dlT
-    & UnitAlgebraDirLim R Sys dlT
+    & ComNzAlgDirLim R Sys dlT
+    & UnitAlgDirLim R Sys dlT
   }.
 
 
@@ -944,7 +1022,7 @@ HB.structure Definition ComUnitAlgebraDirLim
 (** in mathcomp.                                                            *)
 (****************************************************************************)
 
-HB.factory Record DirLim_isNmoduleDirLim
+HB.factory Record DirLim_isNmodDirLim
     disp (I : dirType disp)
     (Obj : I -> nmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
@@ -955,7 +1033,7 @@ HB.builders Context
     (Obj : I -> nmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of DirLim_isNmoduleDirLim _ _ _ _ Sys dlT.
+  dlT of DirLim_isNmodDirLim _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1007,22 +1085,22 @@ split; first by rewrite -dlzeroE.
 by move=> u v; rewrite {2}/GRing.add /= dladdE.
 Qed.
 HB.instance Definition _ :=
-  isNmoduleDirLim.Build _ _ _ _ _ dlT dlinj_is_nmod_morphism.
+  isNmodDirLim.Build _ _ _ _ _ dlT dlinj_is_nmod_morphism.
 HB.end.
 
 
-HB.factory Record NmoduleDirLim_isZmoduleDirLim
+HB.factory Record NmodDirLim_isZmodDirLim
     disp (I : dirType disp)
     (Obj : I -> zmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim _ Sys dlT := {}.
+  dlT of NmodDirLim _ Sys dlT := {}.
 HB.builders Context
     disp (I : dirType disp)
     (Obj : I -> zmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim_isZmoduleDirLim _ _ _ _ Sys dlT.
+  dlT of NmodDirLim_isZmodDirLim _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1048,8 +1126,7 @@ by move=> u v; rewrite {2}/GRing.opp /= dloppE raddfD /=.
 Qed.
 HB.end.
 
-
-HB.factory Record DirLim_isZmoduleDirLim
+HB.factory Record DirLim_isZmodDirLim
     disp (I : dirType disp)
     (Obj : I -> zmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
@@ -1060,26 +1137,27 @@ HB.builders Context
     (Obj : I -> zmodType)
     (bonding : forall i j, i <= j -> {additive Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of DirLim_isZmoduleDirLim _ _ _ _ Sys dlT.
+  dlT of DirLim_isZmodDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isNmoduleDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isNmodDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NmoduleDirLim_isZmoduleDirLim.Build _ _ _ _ Sys dlT.
+  NmodDirLim_isZmodDirLim.Build _ _ _ _ Sys dlT.
+Let check := dlT : zmodDirLimType Sys.
 HB.end.
 
 
-HB.factory Record NmoduleDirLim_isSemiRingDirLim
+HB.factory Record NmodDirLim_isSemiRingDirLim
     disp (I : dirType disp)
     (Obj : I -> semiRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim _ Sys dlT := {}.
+  dlT of NmodDirLim _ Sys dlT := {}.
 HB.builders Context
     disp (I : dirType disp)
     (Obj : I -> semiRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim_isSemiRingDirLim _ _ _ _ Sys dlT.
+  dlT of NmodDirLim_isSemiRingDirLim _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1155,32 +1233,6 @@ HB.instance Definition _ :=
   isSemiRingDirLim.Build _ _ _ _ _ dlT dlinj_is_monoid_morphism.
 HB.end.
 
-
-HB.factory Record SemiRingDirLim_isNzSemiRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> nzSemiRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of SemiRingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> nzSemiRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of SemiRingDirLim_isNzSemiRingDirLim _ _ _ _ Sys dlT.
-
-Fact dl1_neq0 : 1 != 0 :> dlT.
-Proof.
-apply/negP => /eqP.
-rewrite -(dl1E dlT (dirsys_inh Sys)).
-move => /dlinj_eq0 [i] [le_j].
-by rewrite [_ 1]rmorph1=> /eqP; rewrite oner_eq0.
-Qed.
-HB.instance Definition _ :=
-  GRing.SemiRing_isNonZero.Build dlT dl1_neq0.
-HB.end.
-
-
 HB.factory Record DirLim_isSemiRingDirLim
     disp (I : dirType disp)
     (Obj : I -> semiRingType)
@@ -1194,11 +1246,36 @@ HB.builders Context
     (Sys : is_dirsys bonding)
   dlT of DirLim_isSemiRingDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isNmoduleDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isNmodDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NmoduleDirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  NmodDirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
+Let check := dlT : semiRingDirLimType Sys.
 HB.end.
 
+
+HB.factory Record SemiRingDirLim_isNonZero
+    disp (I : dirType disp)
+    (Obj : I -> nzSemiRingType)
+    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of SemiRingDirLim _ Sys dlT := {}.
+HB.builders Context
+    disp (I : dirType disp)
+    (Obj : I -> nzSemiRingType)
+    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of SemiRingDirLim_isNonZero _ _ _ _ Sys dlT.
+
+Fact dl1_neq0 : 1 != 0 :> dlT.
+Proof.
+apply/negP => /eqP.
+rewrite -(dl1E dlT (dirsys_inh Sys)).
+move => /dlinj_eq0 [i] [le_j].
+by rewrite [_ 1]rmorph1=> /eqP; rewrite oner_eq0.
+Qed.
+HB.instance Definition _ :=
+  GRing.SemiRing_isNonZero.Build dlT dl1_neq0.
+HB.end.
 
 HB.factory Record DirLim_isNzSemiRingDirLim
     disp (I : dirType disp)
@@ -1213,47 +1290,11 @@ HB.builders Context
     (Sys : is_dirsys bonding)
   dlT of DirLim_isNzSemiRingDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isNmoduleDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NmoduleDirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  SemiRingDirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_isNonZero.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzSemiRingDirLimType Sys.
 HB.end.
-
-
-HB.factory Record SemiRingDirLim_isRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> ringType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of SemiRingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> ringType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of SemiRingDirLim_isRingDirLim _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  NmoduleDirLim_isZmoduleDirLim.Build _ _ _ _ Sys dlT.
-HB.end.
-
-
-HB.factory Record NzSemiRingDirLim_isNzRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> nzRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzSemiRingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> nzRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzSemiRingDirLim_isNzRingDirLim _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  NmoduleDirLim_isZmoduleDirLim.Build _ _ _ _ Sys dlT.
-HB.end.
-
 
 HB.factory Record DirLim_isRingDirLim
     disp (I : dirType disp)
@@ -1270,9 +1311,9 @@ HB.builders Context
 HB.instance Definition _ :=
   DirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  SemiRingDirLim_isRingDirLim.Build _ _ _ _ Sys dlT.
+  NmodDirLim_isZmodDirLim.Build _ _ _ _ Sys dlT.
+Let check := dlT : ringDirLimType Sys.
 HB.end.
-
 
 HB.factory Record DirLim_isNzRingDirLim
     disp (I : dirType disp)
@@ -1289,11 +1330,12 @@ HB.builders Context
 HB.instance Definition _ :=
   DirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NzSemiRingDirLim_isNzRingDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isRingDirLim.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzRingDirLimType Sys.
 HB.end.
 
 
-HB.factory Record SemiRingDirLim_isComSemiRingDirLim
+HB.factory Record SemiRingDirLim_hasCommutativeMul
     disp (I : dirType disp)
     (Obj : I -> comSemiRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
@@ -1304,7 +1346,7 @@ HB.builders Context
     (Obj : I -> comSemiRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of SemiRingDirLim_isComSemiRingDirLim _ _ _ _ Sys dlT.
+  dlT of SemiRingDirLim_hasCommutativeMul _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1316,24 +1358,6 @@ Qed.
 HB.instance Definition _ :=
   GRing.SemiRing_hasCommutativeMul.Build dlT dlmulC.
 HB.end.
-
-
-HB.factory Record NzSemiRingDirLim_isComNzSemiRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> comNzSemiRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzSemiRingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> comNzSemiRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzSemiRingDirLim_isComNzSemiRingDirLim _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  SemiRingDirLim_isComSemiRingDirLim.Build _ _ _ _ Sys dlT.
-HB.end.
-
 
 HB.factory Record DirLim_isComSemiRingDirLim
     disp (I : dirType disp)
@@ -1350,9 +1374,8 @@ HB.builders Context
 HB.instance Definition _ :=
   DirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  SemiRingDirLim_isComSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
 HB.end.
-
 
 HB.factory Record DirLim_isComNzSemiRingDirLim
     disp (I : dirType disp)
@@ -1367,45 +1390,11 @@ HB.builders Context
     (Sys : is_dirsys bonding)
   dlT of DirLim_isComNzSemiRingDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isComSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  SemiRingDirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comNzSemiRingDirLimType Sys.
 HB.end.
-
-
-HB.factory Record RingDirLim_isComRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> comRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of RingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> comRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of RingDirLim_isComRingDirLim _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  SemiRingDirLim_isComSemiRingDirLim.Build _ _ _ _ Sys dlT.
-HB.end.
-
-
-HB.factory Record NzRingDirLim_isComNzRingDirLim
-    disp (I : dirType disp)
-    (Obj : I -> comNzRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzRingDirLim _ Sys dlT := {}.
-HB.builders Context
-    disp (I : dirType disp)
-    (Obj : I -> comNzRingType)
-    (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
-    (Sys : is_dirsys bonding)
-  dlT of NzRingDirLim_isComNzRingDirLim _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  NzSemiRingDirLim_isComNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
-HB.end.
-
 
 HB.factory Record DirLim_isComRingDirLim
     disp (I : dirType disp)
@@ -1422,9 +1411,9 @@ HB.builders Context
 HB.instance Definition _ :=
   DirLim_isRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  RingDirLim_isComRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comRingDirLimType Sys.
 HB.end.
-
 
 HB.factory Record DirLim_isComNzRingDirLim
     disp (I : dirType disp)
@@ -1441,11 +1430,12 @@ HB.builders Context
 HB.instance Definition _ :=
   DirLim_isNzRingDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NzRingDirLim_isComNzRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comNzSemiRingDirLimType Sys.
 HB.end.
 
 
-HB.factory Record NzRingDirLim_isUnitRingDirLim
+HB.factory Record NzRingDirLim_hasMulInverse
     disp (I : dirType disp)
     (Obj : I -> unitRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
@@ -1461,7 +1451,7 @@ HB.builders Context
     (Obj : I -> unitRingType)
     (bonding : forall i j, i <= j -> {rmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NzRingDirLim_isUnitRingDirLim _ _ _ _ Sys dlT.
+  dlT of NzRingDirLim_hasMulInverse _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1536,7 +1526,8 @@ HB.builders Context
     (Sys : is_dirsys bonding)
   dlT of UnitRingDirLim_isComUnitRingDirLim _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NzRingDirLim_isComNzRingDirLim.Build _ _ _ _ Sys dlT.
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comUnitRingDirLimType Sys.
 HB.end.
 
 
@@ -1593,20 +1584,20 @@ HB.instance Definition _ :=
 HB.end.
 
 
-HB.factory Record NmoduleDirLim_isLSemiModuleDirLim
+HB.factory Record NmodDirLim_isLSemiModDirLim
     (R : semiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiModType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim _ Sys dlT := {}.
+  dlT of NmodDirLim _ Sys dlT := {}.
 HB.builders Context
     (R : semiRingType)
     disp (I : dirType disp)
     (Obj : I -> lSemiModType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NmoduleDirLim_isLSemiModuleDirLim R _ _ _ _ Sys dlT.
+  dlT of NmodDirLim_isLSemiModDirLim R _ _ _ _ Sys dlT.
 
 Implicit Type x y : dlT.
 
@@ -1654,30 +1645,31 @@ split => [r x | x y].
 by rewrite [in RHS]/GRing.scale /= -raddfD.
 Qed.
 HB.instance Definition _ :=
-  isLSemiModuleDirLim.Build R _ _ _ _ _ dlT dlinj_is_semilinear.
+  isLSemiModDirLim.Build R _ _ _ _ _ dlT dlinj_is_semilinear.
 HB.end.
 
-
-HB.factory Record ZmoduleDirLim_isLmoduleDirLim
-    (R : ringType)
+HB.factory Record DirLim_isLSemiModDirLim
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> lmodType R)
+    (Obj : I -> lSemiModType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of ZmoduleDirLim _ Sys dlT := {}.
+  dlT of DirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : ringType)
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> lmodType R)
+    (Obj : I -> lSemiModType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of ZmoduleDirLim_isLmoduleDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isLSemiModDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  NmoduleDirLim_isLSemiModuleDirLim.Build R _ _ _ _ Sys dlT.
+  DirLim_isNmodDirLim.Build _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  NmodDirLim_isLSemiModDirLim.Build _ _ _ _ _ Sys dlT.
+Let check := dlT : lSemiModDirLimType Sys.
 HB.end.
 
-
-HB.factory Record DirLim_isLmoduleDirLim
+HB.factory Record DirLim_isLmodDirLim
     (R : ringType)
     disp (I : dirType disp)
     (Obj : I -> lmodType R)
@@ -1690,35 +1682,34 @@ HB.builders Context
     (Obj : I -> lmodType R)
     (bonding : forall i j, i <= j -> {linear Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of DirLim_isLmoduleDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isLmodDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isZmoduleDirLim.Build _ _ _ _ Sys dlT.
+  DirLim_isZmodDirLim.Build _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  ZmoduleDirLim_isLmoduleDirLim.Build _ _ _ _ _ Sys dlT.
+  NmodDirLim_isLSemiModDirLim.Build _ _ _ _ _ Sys dlT.
+Let check := dlT : lmodDirLimType Sys.
 HB.end.
 
 
-HB.factory Record LSemiModuleDirLim_isLSemiAlgebraDirLim
-    (R : nzSemiRingType)
+HB.factory Record LSemiModDirLim_isLSemiAlgDirLim
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzLSemiAlgType R)
+    (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LSemiModuleDirLim _ Sys dlT := {}.
+  dlT of LSemiModDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : nzSemiRingType)
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzLSemiAlgType R)
+    (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LSemiModuleDirLim_isLSemiAlgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of LSemiModDirLim_isLSemiAlgDirLim R _ _ _ _ Sys dlT.
 
 Implicit Type (x y : dlT) (r : R).
 
 HB.instance Definition _ :=
-  NmoduleDirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
-HB.instance Definition _ :=
-  SemiRingDirLim_isNzSemiRingDirLim.Build _ _ _ _ Sys dlT.
+  NmodDirLim_isSemiRingDirLim.Build _ _ _ _ Sys dlT.
 
 Fact dlscaleAl r x y : r *: (x * y) = r *: x * y.
 Proof.
@@ -1729,27 +1720,73 @@ HB.instance Definition _ :=
   GRing.LSemiModule_isLSemiAlgebra.Build R dlT dlscaleAl.
 HB.end.
 
-
-HB.factory Record LmoduleDirLim_isLalgebraDirLim
-    (R : nzRingType)
+HB.factory Record DirLim_isLSemiAlgDirLim
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzLalgType R)
+    (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LmoduleDirLim _ Sys dlT := {}.
+  dlT of DirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : nzRingType)
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzLalgType R)
+    (Obj : I -> lSemiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LmoduleDirLim_isLalgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isLSemiAlgDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  LSemiModuleDirLim_isLSemiAlgebraDirLim.Build R _ _ _ _ Sys dlT.
+  DirLim_isLSemiModDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  LSemiModDirLim_isLSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+Let check := dlT : lSemiAlgDirLimType Sys.
 HB.end.
 
 
-HB.factory Record DirLim_isLalgebraDirLim
+HB.factory Record DirLim_isNzLSemiAlgDirLim
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> nzLSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> nzLSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isNzLSemiAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isLSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_isNonZero.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzLSemiAlgDirLimType Sys.
+HB.end.
+
+
+HB.factory Record DirLim_isLalgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> lalgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> lalgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isLalgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isLmodDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  LSemiModDirLim_isLSemiAlgDirLim.Build _ _ _ _ _ Sys dlT.
+Let check := dlT : lalgDirLimType Sys.
+HB.end.
+
+
+HB.factory Record DirLim_isNzLalgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> nzLalgType R)
@@ -1762,28 +1799,29 @@ HB.builders Context
     (Obj : I -> nzLalgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of DirLim_isLalgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isNzLalgDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isLmoduleDirLim.Build R _ _ _ _ Sys dlT.
+  DirLim_isLalgDirLim.Build R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  LmoduleDirLim_isLalgebraDirLim.Build R _ _ _ _ Sys dlT.
+  SemiRingDirLim_isNonZero.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzLalgDirLimType Sys.
 HB.end.
 
 
-HB.factory Record LSemiAlgebraDirLim_isSemiAlgebraDirLim
-    (R : nzSemiRingType)
+HB.factory Record LSemiAlgDirLim_isSemiAlgDirLim
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzSemiAlgType R)
+    (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NzLSemiAlgebraDirLim _ Sys dlT := {}.
+  dlT of LSemiAlgDirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : nzSemiRingType)
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzSemiAlgType R)
+    (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LSemiAlgebraDirLim_isSemiAlgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of LSemiAlgDirLim_isSemiAlgDirLim R _ _ _ _ Sys dlT.
 
 Implicit Type (x y : dlT) (r : R).
 
@@ -1796,27 +1834,70 @@ HB.instance Definition _ :=
   GRing.LSemiAlgebra_isSemiAlgebra.Build R dlT dlscaleAr.
 HB.end.
 
-
-HB.factory Record LalgebraDirLim_isAlgebraDirLim
-    (R : nzRingType)
+HB.factory Record DirLim_isSemiAlgDirLim
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzAlgType R)
+    (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of NzLalgebraDirLim _ Sys dlT := {}.
+  dlT of DirLim _ Sys dlT := {}.
 HB.builders Context
-    (R : nzRingType)
+    (R : semiRingType)
     disp (I : dirType disp)
-    (Obj : I -> nzAlgType R)
+    (Obj : I -> semiAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of LalgebraDirLim_isAlgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isSemiAlgDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  LSemiAlgebraDirLim_isSemiAlgebraDirLim.Build R _ _ _ _ Sys dlT.
+  DirLim_isLSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  LSemiAlgDirLim_isSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+Let check := dlT : semiAlgDirLimType Sys.
 HB.end.
 
+HB.factory Record DirLim_isNzSemiAlgDirLim
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> nzSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> nzSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isNzSemiAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_isNonZero.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzSemiAlgDirLimType Sys.
+HB.end.
 
-HB.factory Record DirLim_isAlgebraDirLim
+HB.factory Record DirLim_isAlgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> algType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> algType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isRingDirLim.Build _ _ _ _ Sys dlT.
+Let check := dlT : algDirLimType Sys.
+HB.end.
+
+HB.factory Record DirLim_isNzAlgDirLim
     (R : nzRingType)
     disp (I : dirType disp)
     (Obj : I -> nzAlgType R)
@@ -1829,11 +1910,96 @@ HB.builders Context
     (Obj : I -> nzAlgType R)
     (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
     (Sys : is_dirsys bonding)
-  dlT of DirLim_isAlgebraDirLim R _ _ _ _ Sys dlT.
+  dlT of DirLim_isNzAlgDirLim R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  DirLim_isLalgebraDirLim.Build R _ _ _ _ Sys dlT.
+  DirLim_isAlgDirLim.Build R _ _ _ _ Sys dlT.
 HB.instance Definition _ :=
-  LalgebraDirLim_isAlgebraDirLim.Build R _ _ _ _ Sys dlT.
+  SemiRingDirLim_isNonZero.Build _ _ _ _ Sys dlT.
+Let check := dlT : nzAlgDirLimType Sys.
+HB.end.
+
+HB.factory Record DirLim_isComSemiAlgDirLim
+    (R : semiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : semiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isComSemiAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comSemiAlgDirLimType Sys.
+HB.end.
+
+HB.factory Record DirLim_isComNzSemiAlgDirLim
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comNzSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : nzSemiRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comNzSemiAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isComNzSemiAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isNzSemiAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comNzSemiAlgDirLimType Sys.
+HB.end.
+
+HB.factory Record DirLim_isComAlgDirLim
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> comAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : ringType)
+    disp (I : dirType disp)
+    (Obj : I -> comAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isComAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comAlgDirLimType Sys.
+HB.end.
+
+HB.factory Record DirLim_isComNzAlgDirLim
+    (R : nzRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comNzAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim _ Sys dlT := {}.
+HB.builders Context
+    (R : nzRingType)
+    disp (I : dirType disp)
+    (Obj : I -> comNzAlgType R)
+    (bonding : forall i j, i <= j -> {lrmorphism Obj i -> Obj j})
+    (Sys : is_dirsys bonding)
+  dlT of DirLim_isComNzAlgDirLim R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  DirLim_isNzAlgDirLim.Build R _ _ _ _ Sys dlT.
+HB.instance Definition _ :=
+  SemiRingDirLim_hasCommutativeMul.Build _ _ _ _ Sys dlT.
+Let check := dlT : comNzAlgDirLimType Sys.
 HB.end.
 
 

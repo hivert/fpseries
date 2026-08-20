@@ -251,7 +251,7 @@ End UniversalProperty.
 HB.instance Definition _ :=
   isInvLim.Build _ _ _ _ fps_invsys {fps R} fpsprojP fpsindP fpsindE.
 HB.instance Definition _ :=
-  InvLim_isLSemiAlgebraInvLim.Build R _ _ _ _ fps_invsys {fps R}.
+  InvLim_isNzLSemiAlgInvLim.Build R _ _ _ _ fps_invsys {fps R}.
 
 End DefsSemiRing.
 
@@ -760,16 +760,17 @@ Definition coefs_simpl :=
 
 (* Generate the instances *)
 HB.instance Definition _ (R : comNzSemiRingType) :=
-  InvLim_isComNzSemiRingInvLim.Build _ _ _ _ _ {fps R}.
+  InvLim_isComNzSemiAlgInvLim.Build R _ _ _ _ _ {fps R}.
 HB.instance Definition _ (R : comNzRingType) :=
-  InvLim_isComNzRingInvLim.Build _ _ _ _ _ {fps R}.
-HB.instance Definition _ (R : comUnitRingType) := InvLim.on {fps R}.
+  InvLim_isComNzAlgInvLim.Build R _ _ _ _ _ {fps R}.
+HB.instance Definition _ (R : comUnitRingType) :=
+  InvLim_isUnitRingInvLim.Build _ _ _ _ _ {fps R}.
 
 Section Test.
 
-Let check_NS (R : comNzSemiRingType) := {fps R} : comNzSemiRingType.
-Let check_NR (R : comNzRingType) := {fps R} : comNzRingType.
-Let check_Un (R : comUnitRingType) := {fps R} : comUnitRingType.
+Let check_NS (R : comNzSemiRingType) := {fps R} : comNzSemiAlgInvLimType _.
+Let check_NR (R : comNzRingType) := {fps R} : comNzAlgInvLimType _.
+Let check_Un (R : comUnitRingType) := {fps R} : comUnitAlgInvLimType _.
 
 End Test.
 
