@@ -36,7 +36,7 @@ From mathcomp Require Import zify ring field lra.
 
 Require Import tfps auxresults.
 
-Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -132,7 +132,7 @@ have -> : (1 *- 2)^+ i.+1 = \prod_(i0 < i.+1) (1 *- 2) :> rat.
 rewrite -big_split /= big_ord_recl /=.
 rewrite subr0 mulNr divrr // mulN1r 2!mulrN [LHS]opprK.
 rewrite exprS !mulrA [2%:R^-1 * 2%:R]mulVf // mul1r.
-rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=; last first.
+rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=.
   by move=> j _; rewrite /bump /=; field.
 elim: i => [|i IHi]; first by rewrite expr0 big_ord0 double0 fact0 mulr1.
 rewrite big_ord_recr /= exprS -mulrA mulrC mulrA {}IHi.
@@ -189,7 +189,7 @@ Proposition FC_fixpoint_eq n : (FC n.+1 - 1) = lagrfix ((1 + \X) ^+ 2).
 Proof.
 apply: (lagrfix_uniq (one_plusX_2_unit _)).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
-rewrite rmorphXn rmorphD /= comp_tfps1 comp_tfpsX //; first last.
+rewrite rmorphXn rmorphD /= comp_tfps1 comp_tfpsX //.
   rewrite coeft0_eq0E coef_trXn coeftB coeft1.
   by rewrite coef_tfps_of_fun /= Cat0 subrr.
 rewrite -(trXnt1 _ n.+1) raddfB /= addrC subrK -rmorphXn /=.
@@ -209,7 +209,7 @@ rewrite -exprM mul2n addrC exprD1n coeft_sum.
 have Hord : (i < (i.+1).*2.+1)%N by nia.
 rewrite (bigD1 (Ordinal Hord)) //= -!/(_`_i.+1).
 rewrite !coeft_simpl // eqxx leqnn /= (_ : 1%:R = 1) //.
-rewrite big1 ?addr0 => [|[j /= Hj]]; first last.
+rewrite big1 ?addr0 => [[j /= Hj] |].
   rewrite -val_eqE /= => {Hj} /negbTE Hj.
   by rewrite !coeft_simpl eq_sym Hj andbF mul0rn.
 rewrite ltnS in Hord.
@@ -281,7 +281,7 @@ Proof.
 elim: n => [| n IHn] /=; first by rewrite Cat0 bin0.
 rewrite Catalan_rec doubleS !binS.
 have leq_n2 : n <= n.*2 by rewrite -addnn leq_addr.
-rewrite -[X in _ + _ + X]bin_sub; last exact: (leq_trans leq_n2 (leqnSn _)).
+rewrite -[X in _ + _ + X]bin_sub; first exact: (leq_trans leq_n2 (leqnSn _)).
 rewrite subSn // -{4}addnn addnK binS addnn.
 rewrite addn2 -[4]/(2 * 2) -mulnA !mul2n -doubleS -doubleMl; congr _.*2.
 rewrite -IHn -{1}addnn -addnS mulnDl; congr (_ + _).

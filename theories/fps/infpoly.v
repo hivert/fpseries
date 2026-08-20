@@ -22,7 +22,7 @@ From mathcomp Require Import freeg mpoly.
 From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import order.
 
-Require Import natbar directed invlim dirlim_constr dirlim.
+Require Import natbar directed dirlim_constr dirlim.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

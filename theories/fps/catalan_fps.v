@@ -36,7 +36,7 @@ From mathcomp Require Import zify ring lra.
 
 Require Import auxresults fps.
 
-Set SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
+Unset SsrOldRewriteGoalsOrder.  (* change to Unset and remove the line when requiring MathComp >= 2.6 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -74,16 +74,16 @@ Local Open Scope fps_scope.
 Definition FC : {fps rat} := \fps (Cat i)%:R .X^i.
 
 Lemma FC_in_coef0_eq1 : FC \in coefs0_eq1.
-Proof. by rewrite coefs0_eq1E coefs_FPSeries Cat0. Qed.
+Proof. by rewrite coefs0_eq1E coef_fps Cat0. Qed.
 
 Proposition FC_algebraic_eq : FC = 1 + ''X * FC ^+ 2.
 Proof.
 rewrite /FC; apply/fpsP => i.
-rewrite !(coefs_FPSeries, coefs_simpl).
+rewrite !(coef_fps, coefs_simpl).
 case: i => [|i]; first by rewrite Cat0 addr0.
 rewrite add0r CatS /= expr2 coefsM natr_sum.
 apply eq_bigr => [[j /= _]] _.
-by rewrite !coefs_FPSeries natrM.
+by rewrite !coef_fps natrM.
 Qed.
 
 End GenSeries.
@@ -105,7 +105,7 @@ have co1 : 1 - 4%:R *: ''X \in @coefs0_eq1 rat.
   by rewrite mulr_nat coefs0_eq1E !coefs_simpl subr0.
 have: (2%:R *: ''X * FC - 1) ^+ 2 = 1 - 4%:R *: ''X.
   by rewrite !mulr_nat sqrrB1 {2}FC_algebraic_eq; ring.
-move/(sqrtE nat_unit) => /(_ co1) [HeqP | HeqN].
+move/(sqrtE pchar_rat) => /(_ co1) [HeqP | HeqN].
   exfalso; move: HeqP => /(congr1 (fun x => x``_0)).
   rewrite mulr_nat; repeat rewrite ?coefs_simpl -?mulrA ?eqxx /=.
   rewrite (eqP (coefs0_eq1_expr _ _)) => /eqP.
@@ -128,7 +128,7 @@ have -> : (1 *- 2)^+ i.+1 = \prod_(i0 < i.+1) (1 *- 2) :> rat.
 rewrite -big_split /= big_ord_recl /=.
 rewrite subr0 mulNr divrr // mulN1r 2!mulrN [LHS]opprK.
 rewrite exprS !mulrA [2%:R^-1 * 2%:R]mulVf // mul1r.
-rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=; last first.
+rewrite (eq_bigr (fun j : 'I_i => (2 * j + 1)%:R)) /=.
   by move=> j _; rewrite /bump /=; field.
 elim: i => [|i IHi]; first by rewrite expr0 big_ord0 double0 fact0 mulr1.
 rewrite big_ord_recr /= exprS -mulrA mulrC mulrA {}IHi.
@@ -140,7 +140,7 @@ by rewrite doubleS !factS; rewrite -mul2n; field.
 Qed.
 
 Theorem Cat_rat i : (Cat i)%:R = i.*2`!%:R / i`!%:R /i.+1`!%:R :> rat.
-Proof. by rewrite -coefFC coefs_FPSeries. Qed.
+Proof. by rewrite -coefFC coef_fps. Qed.
 
 Local Close Scope ring_scope.
 
@@ -185,9 +185,10 @@ Proposition FC_fixpoint_eq : FC - 1 = lagrfix ((1 + ''X) ^+ 2).
 Proof.
 apply: (lagrfix_uniq one_plusX_2_unit).
 rewrite {1}FC_algebraic_eq -addrA addrC subrK.
-rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //; first by ring.
+rewrite rmorphXn rmorphD /= comp_fps1 comp_fpsX //.
 rewrite coefs0_eq0E coefsB coefs1.
-  by rewrite coefs_FPSeries /= Cat0 subrr.
+  by rewrite coef_fps /= Cat0 subrr.
+by rewrite addrC subrK.
 Qed.
 
 Theorem CatM_Lagrange i : (i.+1 * (Cat i))%N = 'C(i.*2, i).
@@ -195,13 +196,13 @@ Proof.
 case: i => [|i]; first by rewrite Cat0 mul1n bin0.
 apply/eqP; rewrite -(Num.Theory.eqr_nat rat); rewrite natrM.
 have:= (congr1 (fun s => s``_i.+1) FC_fixpoint_eq).
-rewrite !coefs_simpl coefs_FPSeries subr0 /= => ->.
+rewrite !coefs_simpl coef_fps subr0 /= => ->.
 rewrite coefs_lagrfix ?one_plusX_2_unit //.
 rewrite -exprM mul2n addrC exprD1n coefs_sum.
 have Hord : (i < (i.+1).*2.+1)%N by nia.
 rewrite (bigD1 (Ordinal Hord)) //= -!/(_`_i.+1).
 rewrite coefsMn coef_fpsXn // eqxx /=.
-rewrite big1 ?addr0 => [|[j /= Hj]]; first last.
+rewrite big1 ?addr0 => [[j /= Hj] |].
   rewrite -val_eqE /= => {Hj} /negbTE Hj.
   by rewrite !coefs_simpl eq_sym Hj mul0rn.
 rewrite ltnS in Hord.
@@ -255,7 +256,7 @@ Proof.
 have := congr1 (fun x => (x``_n.+1)%R) FC_differential_eq.
 rewrite coefs1 coefsD !mulrDl !mul1r !coefsD.
 rewrite -!mulNrn !(mulrnAl, coefsMn, mulNr, coefsN).
-rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coefs_FPSeries.
+rewrite -mulrA !coef_fpsXM /= !coef_deriv_fps !coef_fps.
 case: n => [|n] /=; first by rewrite !Catsimpl.
 move: {n} n.+1 => n; move: (Cat n.+1) (Cat n) => Cn1 Cn.
 rewrite !mulNrn addrA [X in (X - _)%R]addrC addrA -mulrSr -!mulrnA.
@@ -268,7 +269,7 @@ Proof.
 elim: n => [| n IHn] /=; first by rewrite Cat0 bin0.
 rewrite Catalan_rec doubleS !binS.
 have leq_n2 : n <= n.*2 by rewrite -addnn leq_addr.
-rewrite -[X in _ + _ + X]bin_sub; last exact: (leq_trans leq_n2 (leqnSn _)).
+rewrite -[X in _ + _ + X]bin_sub; first exact: (leq_trans leq_n2 (leqnSn _)).
 rewrite subSn // -{4}addnn addnK binS addnn.
 rewrite addn2 -[4]/(2 * 2) -mulnA !mul2n -doubleS -doubleMl; congr _.*2.
 rewrite -IHn -{1}addnn -addnS mulnDl; congr (_ + _).

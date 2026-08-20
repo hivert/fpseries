@@ -144,8 +144,8 @@ Lemma ltbar0Sn n : Nat 0 < Nat n.+1.   Proof. by []. Qed.
 Lemma ltbarS n : Nat n < Nat n.+1.     Proof. by rewrite ltEnatbar. Qed.
 Lemma lebarS n : Nat n <= Nat n.+1.    Proof. by rewrite leEnatbar. Qed.
 Hint Resolve lebarS : core.
-Lemma ltIbar v : Inf < v = false.      Proof. exact/le_gtF/lex1. Qed.
-Lemma leInatbar n : Inf <= Nat n = false.
+Lemma ltIbar v : (Inf < v) = false.      Proof. exact/le_gtF/lex1. Qed.
+Lemma leInatbar n : (Inf <= Nat n) = false.
 Proof. by []. Qed.
 
 (* Q: Anything particular to have a morphism here ? *)

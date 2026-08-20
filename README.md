@@ -1,6 +1,6 @@
 # Formal Power Series
 
-[![Nix CI for bundle rocq-9.0-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mcmaster](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mcmaster.yml)
+[![Nix CI for bundle rocq-9.0-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.0-mc2.5.0.yml) [![Nix CI for bundle rocq-9.1-mc2.5.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.1-mc2.5.0.yml) [![Nix CI for bundle rocq-9.2-mc2.6.0](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.2-mc2.6.0.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.2-mc2.6.0.yml) [![Nix CI for bundle rocq-9.2-mcmaster](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.2-mcmaster.yml/badge.svg)](https://github.com/hivert/fpseries/actions/workflows/nix-action-rocq-9.2-mcmaster.yml)
 
 
 ## Formal power series in Mathematical Components.
@@ -51,6 +51,10 @@ using Lagrange inversion formula;
 3 - Transform the algebraic equation into the holonomic differential equation
  $(1 - 2X) F + (1 - 4X) X F' = 1$ which give the recursion
  $(n+2) C_{n+1} = (4n + 2) C_n$ and solve it.
+
+## Presentation
+
+The [slide](https://mathcomp-schools.gitlabpages.inria.fr/2022-12-school/assets/pdf/talk-hivert.pdf) of a talk at [Mathematical Components - 10 years after the Odd Order Theorem](https://mathcomp-schools.gitlabpages.inria.fr/2022-12-school/workshop).
 
 ## Authors
 
